@@ -1,5 +1,4 @@
 {
-    "port": 2000,
     "robot": {
         "availableCommands": [
             "DRIVE_FOWARD",
@@ -10,5 +9,8 @@
             "STOP_TURNING"
         ],
         "serialPortName": "/dev/ttyACM0"
+    }, 
+    "api": {
+        "url": "ws://localhost:3001/robot"
     }
 }

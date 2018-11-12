@@ -1,0 +1,9 @@
+{
+    "httpServer": {
+        "port": 3000
+    },
+    "robotWsServer": {
+        "port": 3001,
+        "path": "/robot"
+    }
+}
