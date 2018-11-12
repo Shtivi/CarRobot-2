@@ -1,5 +1,3 @@
-import express from 'express';
-import {Router, Request, Response} from 'express';
 import ConfigLoader from './config/ConfigLoader';
 import { Config } from './config/Config';
 import { RobotCommandsMapping } from './robotControl/RobotCommandsMapping';
@@ -8,10 +6,10 @@ import { ArduinoSerialCommunicator } from './robotControl/ArduinoSerialCommunica
 import { SerialCommunicationOptions } from './robotControl/SerialCommunicationOptions';
 import { RobotCommand } from './robotControl/RobotCommand';
 import { DemoSerialCommunicator } from './robotControl/DemoSerialCommunicator';
+import WebSocket from 'ws';
 
-console.log("starting server initialization");
-const app: express.Express = express();
-const environment: string = (process.env.NODE_ENV ? process.env.NODE_ENV.trim().toUpperCase() : 'PROD');
+console.log("starting initialization");
+const environment: string = (process.env.NODE_ENV ? process.env.NODE_ENV.trim().toUpperCase() : 'DEV');
 console.log(`environment set to: ${environment}`);
 
 console.log("loading configuration");
@@ -24,24 +22,17 @@ let robotCommunicator: IRobotCommunicator<SerialCommunicationOptions> = new Ardu
 console.log("initializing robot connection");
 robotCommunicator.connect(new SerialCommunicationOptions(config.robot.serialPortName)).then(() => {
     console.log("robot connected");
-    robotCommunicator.sendCommand(RobotCommand.of('on;')).then(() => {
-        console.log('sent on;');
-        setTimeout(() => robotCommunicator.sendCommand(RobotCommand.of('off;')), 3000);
+    console.log("connecting to robot websocket server");
+    
+    const wsClient: WebSocket = new WebSocket(config.api.url);
+    wsClient.on('open', () => {
+        console.log('robot websocket connected');
     });
-    app.listen(config.port, () => {
-        console.log(`listening at http://localhost:${config.port}`);
+
+    wsClient.on('message', (data) => {
+        console.log(data);
     })
 }).catch(err => {
     console.error("robot connection failed");
     console.error(err);
 })
-
-const router: Router = Router();
-router.get('/:cmd', (req: Request, res: Response) => {
-    robotCommunicator.sendCommand(RobotCommand.of(req.params.cmd)).then(() => {
-        res.status(200).send("sent " + req.params.cmd);
-    }).catch(err => {
-        res.status(500).send(err);
-    })
-})
-app.use('/', router);
