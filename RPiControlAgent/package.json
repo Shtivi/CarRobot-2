@@ -1,5 +1,5 @@
 {
-  "name": "rpi-server",
+  "name": "rpi-control-agent",
   "version": "1.0.0",
   "description": "A program that will run on the raspberry-pi and serve a web api to command the robot and receive data from it",
   "main": "./build/Server.js",
@@ -18,10 +18,12 @@
     "@types/express": "^4.16.0",
     "@types/raspi": "^5.0.0",
     "@types/raspi-serial": "^5.0.0",
+    "@types/websocket": "0.0.40",
     "express": "^4.16.4",
     "raspi": "^5.0.2",
     "raspi-serial": "^5.0.0",
-    "typescript": "^3.1.6"
+    "typescript": "^3.1.6",
+    "websocket": "^1.0.28"
   },
   "devDependencies": {
     "@types/node": "^10.12.4"

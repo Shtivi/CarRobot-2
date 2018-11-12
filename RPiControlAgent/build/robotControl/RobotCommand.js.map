@@ -1,0 +1,1 @@
+{"version":3,"file":"RobotCommand.js","sourceRoot":"","sources":["../../src/robotControl/RobotCommand.ts"],"names":[],"mappings":";;AAAA;IAOI,sBAAmB,OAAe;QAC9B,IAAI,CAAC,WAAW,GAAG,OAAO,CAAC;IAC/B,CAAC;IANa,eAAE,GAAhB,UAAiB,WAAmB;QAChC,OAAO,IAAI,YAAY,CAAC,WAAW,CAAC,CAAC;IACzC,CAAC;IAKL,mBAAC;AAAD,CAAC,AAVD,IAUC;AAVY,oCAAY"}
