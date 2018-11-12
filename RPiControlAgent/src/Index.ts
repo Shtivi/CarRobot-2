@@ -29,8 +29,13 @@ robotCommunicator.connect(new SerialCommunicationOptions(config.robot.serialPort
         console.log('robot websocket connected');
     });
 
+    wsClient.on('close', (client: WebSocket, code: number, reason: string) => {
+        console.log(`robot websocket connection closed: ${code} ${reason}`);
+    })
+
     wsClient.on('message', (data) => {
-        console.log(data);
+        console.log(`command received: ${data}`);
+        robotCommunicator.sendCommand(RobotCommand.of(data.toString()));
     })
 }).catch(err => {
     console.error("robot connection failed");

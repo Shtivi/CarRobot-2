@@ -11,6 +11,6 @@
         "serialPortName": "/dev/ttyACM0"
     }, 
     "api": {
-        "url": "ws://localhost:3001/robot"
+        "url": "ws://192.168.1.39:3001/robot"
     }
 }
