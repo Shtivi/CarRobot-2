@@ -19,7 +19,6 @@ const robotWsServer = new WebSocket.Server({
     console.log(`robot web socket server is listenning at: ws://localhost:${config.robotWsServer.port}${config.robotWsServer.path}`);
     robotWsServer.on('connection', (connection: WebSocket) => {
         console.log("connection");
-        connection.send("on;");
     });
 })
 

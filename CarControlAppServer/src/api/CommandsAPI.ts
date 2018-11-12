@@ -8,9 +8,10 @@ export class CommandsAPI {
         this.router = Router();
 
         this.router.get('/:cmd', (req: Request, res: Response) => {
-            (<WebSocket[]>wss.clients).forEach((client: WebSocket) => {
+            wss.clients.forEach((client: WebSocket) => {
                 client.send(req.params.cmd);
             })
+            res.send();
         })
     }
 }
