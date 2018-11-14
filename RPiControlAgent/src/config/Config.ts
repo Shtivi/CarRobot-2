@@ -5,6 +5,10 @@ export class Config {
     }
 
     public api: {
-        url: string
+        url: string,
+        retryPolicy: {
+            allowRetry: boolean,
+            maxConnectionAttempts: number
+        }
     }
 }
