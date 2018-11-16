@@ -34,8 +34,8 @@ robotCommunicator.connect({ serialPortName: config.robot.serialPortName }).then(
     client.connect().then(() => {
         console.log('connected');
         client.on('data', (data: string) => {
-            console.log(`received command: ${data}`);   
-            robotCommunicator.sendCommand(RobotCommand.of('data'));
+            console.log(`Received command: ${data}. Sendind to robot...`);   
+            robotCommunicator.sendCommand(RobotCommand.of('data')).then(() => console.log(`command ${data} sent.`)).catch(console.error);
         })
     }).catch(() => console.error('failed to connect'));
 }).catch(err => {
