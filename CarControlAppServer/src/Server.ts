@@ -1,8 +1,9 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { Config } from './config/Config';
 import ConfigLoader from './config/ConfigLoader';
 import * as WebSocket from 'ws';
 import { CommandsAPI } from './api/CommandsAPI';
+import { IRouter } from 'express-serve-static-core';
 
 console.log("starting server initialization");
 const environment: string = (process.env.NODE_ENV ? process.env.NODE_ENV.trim().toUpperCase() : 'PROD');
@@ -12,6 +13,7 @@ console.log("loading configuration");
 const config: Config = ConfigLoader.loadConfig(environment);
 
 console.log("booting up robot web socket server");
+
 const robotWsServer = new WebSocket.Server({
     port: config.robotWsServer.port,
     path: config.robotWsServer.path
@@ -25,7 +27,9 @@ const robotWsServer = new WebSocket.Server({
 console.log("booting up http server");
 const app: express.Application = express();
 
-app.use(new CommandsAPI(robotWsServer).router)
+const generalRouter: IRouter = Router();
+generalRouter.use('/commands', [new CommandsAPI(robotWsServer).router()]);
+app.use('/api', generalRouter);
 
 app.listen(config.httpServer.port, () => {
     console.log(`http server listenning at: http://localhost:${config.httpServer.port}`);

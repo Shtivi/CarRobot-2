@@ -13,7 +13,7 @@
     "api": {
         "url": "ws://localhost:3001/robot",
         "retryPolicy": {
-            "maxAttempts": "3"
+            "maxConnectionAttempts": "10"
         }
     }
 }

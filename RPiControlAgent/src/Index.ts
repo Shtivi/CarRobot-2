@@ -7,6 +7,7 @@ import { SerialCommunicationOptions } from './robotControl/SerialCommunicationOp
 import { RobotCommand } from './robotControl/RobotCommand';
 import { DemoSerialCommunicator } from './robotControl/DemoSerialCommunicator';
 import WebSocket from 'ws';
+import { MasterClient } from './client/MasterClient';
 
 console.log("starting initialization");
 const environment: string = (process.env.NODE_ENV ? process.env.NODE_ENV.trim().toUpperCase() : 'DEV');
@@ -17,26 +18,17 @@ let config: Config = ConfigLoader.loadConfig(environment);
 
 let robotCommandsMapping: RobotCommandsMapping = 
     new RobotCommandsMapping(config.robot.availableCommands);
-let robotCommunicator: IRobotCommunicator<SerialCommunicationOptions> = new ArduinoSerialCommunicator();
+let robotCommunicator: IRobotCommunicator<SerialCommunicationOptions> = new DemoSerialCommunicator();
 
 console.log("initializing robot connection");
-robotCommunicator.connect(new SerialCommunicationOptions(config.robot.serialPortName)).then(() => {
+robotCommunicator.connect({ serialPortName: config.robot.serialPortName }).then(() => {
     console.log("robot connected");
-    console.log("connecting to robot websocket server");
-    
-    const wsClient: WebSocket = new WebSocket(config.api.url);
-    wsClient.on('open', () => {
-        console.log('robot websocket connected');
-    });
 
-    wsClient.on('close', (client: WebSocket, code: number, reason: string) => {
-        console.log(`robot websocket connection closed: ${code} ${reason}`);
-    })
-
-    wsClient.on('message', (data) => {
-        console.log(`command received: ${data}`);
-        robotCommunicator.sendCommand(RobotCommand.of(data.toString()));
-    })
+    new MasterClient({
+        allowRetry: true, 
+        apiUrl: config.api.url, 
+        maxConnectionAttemps: config.api.retryPolicy.maxConnectionAttempts
+    }).connect().then(() => console.log('connected')).catch(console.error);
 }).catch(err => {
     console.error("robot connection failed");
     console.error(err);

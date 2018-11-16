@@ -25,15 +25,27 @@ export class Optional<T> {
         return this.value;
     }
 
-    public ifPresnet(callback: (value: T) => void) {
+    public ifPresnet(callback: (value: T) => void): Optional<T> {
         if (this.isPresent()) {
             callback(this.get());
         }
+        
+        return this;
     }
 
-    public ifNotPresent(callback: () => void) {
+    public ifNotPresent(callback: () => void): Optional<T> {
         if (!this.isPresent()) {
             callback();
         }
+
+        return this;
     };
+
+    public orElseThrow(error: Error): T {
+        if (!this.isPresent()) {
+            throw error;
+        }
+
+        return this.get();
+    }
 }
