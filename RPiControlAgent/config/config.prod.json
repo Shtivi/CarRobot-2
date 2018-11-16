@@ -3,10 +3,9 @@
         "availableCommands": [
             "DRIVE_FOWARD",
             "DRIVE_BACKWARDS",
-            "STOP_DRIVING",
+            "STOP",
             "TURN_LEFT",
-            "TURN_RIGHT",
-            "STOP_TURNING"
+            "TURN_RIGHT"
         ],
         "serialPortName": "/dev/ttyACM0"
     }, 

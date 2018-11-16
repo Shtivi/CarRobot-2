@@ -18,7 +18,7 @@ let config: Config = ConfigLoader.loadConfig(environment);
 
 let robotCommandsMapping: RobotCommandsMapping = 
     new RobotCommandsMapping(config.robot.availableCommands);
-let robotCommunicator: IRobotCommunicator<SerialCommunicationOptions> = new DemoSerialCommunicator();
+let robotCommunicator: IRobotCommunicator<SerialCommunicationOptions> = new ArduinoSerialCommunicator();
 
 console.log("initializing robot connection");
 robotCommunicator.connect({ serialPortName: config.robot.serialPortName }).then(() => {
