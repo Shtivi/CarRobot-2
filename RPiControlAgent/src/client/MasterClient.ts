@@ -36,8 +36,8 @@ export class MasterClient extends events.EventEmitter implements IMasterClient {
                     .withAttemptsInterval(10000)
                     .handleNextAttempt((attemptNo: number) => console.log(`attempting to connect to remote master server: ${attemptNo} of ${maxConnectionAttemps}`))
                     .handleAttemptFailure((attemptNo: number, err: any) => console.error(`failed to connect: ${err}`))
-                    .handleTermination(() => console.error('all attempts to connect failed'))
-                    .handleSuccess((attemptNo: number) => console.log('connected to server'))
+                    .handleTermination(reject)
+                    .handleSuccess((attemptNo: number) => resolve())
                     .run();
             }
         });
@@ -51,10 +51,14 @@ export class MasterClient extends events.EventEmitter implements IMasterClient {
     }
 
     private connectionActionCreator(success, fail): void {
+        let self = this;
         this._connectionStatus = ConnectionStatus.CONNECTING;
         this._websocketClient = new WebSocket(this._options.apiUrl)
             .once('open', () => {
                 this._connectionStatus = ConnectionStatus.CONNECTED;
+                this._websocketClient.on('message', (data: WebSocket.Data) => {
+                    self.emit('data', data.toString());
+                })
                 success();
             })
             .once('closed',(code: number, reason: string) => {

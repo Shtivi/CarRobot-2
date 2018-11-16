@@ -8,6 +8,7 @@ import { RobotCommand } from './robotControl/RobotCommand';
 import { DemoSerialCommunicator } from './robotControl/DemoSerialCommunicator';
 import WebSocket from 'ws';
 import { MasterClient } from './client/MasterClient';
+import { IMasterClient } from './client/IMasterClient';
 
 console.log("starting initialization");
 const environment: string = (process.env.NODE_ENV ? process.env.NODE_ENV.trim().toUpperCase() : 'DEV');
@@ -24,11 +25,19 @@ console.log("initializing robot connection");
 robotCommunicator.connect({ serialPortName: config.robot.serialPortName }).then(() => {
     console.log("robot connected");
 
-    new MasterClient({
+    let client: IMasterClient = new MasterClient({
         allowRetry: true, 
         apiUrl: config.api.url, 
         maxConnectionAttemps: config.api.retryPolicy.maxConnectionAttempts
-    }).connect().then(() => console.log('connected')).catch(console.error);
+    });
+
+    client.connect().then(() => {
+        console.log('connected');
+        client.on('data', (data: string) => {
+            console.log(`received command: ${data}`);   
+            robotCommunicator.sendCommand(RobotCommand.of('data'));
+        })
+    }).catch(() => console.error('failed to connect'));
 }).catch(err => {
     console.error("robot connection failed");
     console.error(err);
