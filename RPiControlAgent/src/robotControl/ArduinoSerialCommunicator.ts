@@ -7,6 +7,7 @@ import { RobotConnectionStatus } from "./RobotConnectionStatus";
 
 export class ArduinoSerialCommunicator implements IRobotCommunicator<SerialCommunicationOptions> {
     private connectionStatus: RobotConnectionStatus;
+    private connectionOptions: SerialCommunicationOptions;
     private serial: Serial;
 
     public constructor() {
@@ -20,14 +21,15 @@ export class ArduinoSerialCommunicator implements IRobotCommunicator<SerialCommu
     public connect(connectionOptions: SerialCommunicationOptions): Promise<void> {
         return new Promise((resolve, reject) => {
             init(() => {
-                this.serial = new Serial({
-                    portId: connectionOptions.serialPortName
-                });
+                this.connectionStatus = RobotConnectionStatus.CONNECTED;
+                resolve();
+                // this.serial = new Serial({
+                //     portId: connectionOptions.serialPortName
+                // });
 
-                this.serial.open(() => {
-                    this.connectionStatus = RobotConnectionStatus.CONNECTED;
-                    resolve();
-                });
+                // this.serial.open(() => {
+                //     resolve();
+                // });
             })
         });
     }
@@ -46,19 +48,26 @@ export class ArduinoSerialCommunicator implements IRobotCommunicator<SerialCommu
 
     sendCommand(command: RobotCommand): Promise<void> {
         return new Promise((resolve, reject) => {
-            if (this.getConnectionStatus() != RobotConnectionStatus.CONNECTED) {
-                reject('Cannot send command; The robot is not available.');
-                return;
-            }
-            this.serial.write(command.commandName, () => {
-                this.serial.flush((err: any) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve();
-                    }
-                });
-            })
+            this.serial = new Serial({
+                portId: this.connectionOptions.serialPortName
+            });
+
+            this.serial.open(() => {
+                this.serial.write(command.commandName, () => resolve());
+            });
+            // if (this.getConnectionStatus() != RobotConnectionStatus.CONNECTED) {
+            //     reject('Cannot send command; The robot is not available.');
+            //     return;
+            // }
+            // this.serial.write(command.commandName, () => {
+            //     this.serial.flush((err: any) => {
+            //         if (err) {
+            //             reject(err);
+            //         } else {
+            //             resolve();
+            //         }
+            //     });
+            // })
         })
     }
 }

@@ -7,7 +7,7 @@
             "TURN_LEFT",
             "TURN_RIGHT"
         ],
-        "serialPortName": "/dev/ttyACM0"
+        "serialPortName": "/dev/arduino"
     }, 
     "api": {
         "url": "ws://192.168.1.39:3001/robot",
