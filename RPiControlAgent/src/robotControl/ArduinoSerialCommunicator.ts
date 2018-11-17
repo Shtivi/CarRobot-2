@@ -50,15 +50,13 @@ export class ArduinoSerialCommunicator implements IRobotCommunicator<SerialCommu
                 reject('Cannot send command; The robot is not available.');
                 return;
             }
-
-            this.serial.flush((err: any) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                
-                this.serial.write(command.commandName, () => {
-                    resolve();
+            this.serial.write(command.commandName, () => {
+                this.serial.flush((err: any) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
                 });
             })
         })
