@@ -22,6 +22,7 @@ export class ArduinoSerialCommunicator implements IRobotCommunicator<SerialCommu
         return new Promise((resolve, reject) => {
             init(() => {
                 this.connectionStatus = RobotConnectionStatus.CONNECTED;
+                this.connectionOptions = connectionOptions;
                 resolve();
                 // this.serial = new Serial({
                 //     portId: connectionOptions.serialPortName
