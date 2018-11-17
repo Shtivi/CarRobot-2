@@ -51,9 +51,14 @@ export class ArduinoSerialCommunicator implements IRobotCommunicator<SerialCommu
                 return;
             }
 
+            this.serial.flush((err: any) => {
+                reject(err);
+            })
+            
             this.serial.write(command.commandName, () => {
                 resolve();
-            })
+            });
+
         })
     }
 }
