@@ -21,7 +21,9 @@ var DemoSerialCommunicator = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     DemoSerialCommunicator.prototype.connect = function (connectionOptions) {
+        var _this = this;
         this.connectionStatus = RobotConnectionStatus_1.RobotConnectionStatus.CONNECTED;
+        setTimeout(function () { return _this.emit('close', new Error('kaki')); }, 2000);
         return Promise.resolve();
     };
     DemoSerialCommunicator.prototype.disconnect = function () {

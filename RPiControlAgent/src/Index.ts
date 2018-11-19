@@ -23,39 +23,35 @@ let robotCommandsMapping: RobotCommandsMapping =
     new RobotCommandsMapping(config.robot.availableCommands);
 let robotCommunicator: IRobotCommunicator<SerialCommunicationOptions> = new ArduinoSerialCommunicator();
 
-console.log("initializing robot connection");
+let client: IMasterClient = new MasterClient({
+    allowRetry: true, 
+    apiUrl: config.api.url, 
+    maxConnectionAttemps: config.api.retryPolicy.maxConnectionAttempts
+});
 
-robotCommunicator.connect({ serialPortName: config.robot.serialPortName }).then(() => {
-    console.log("robot connected");
-
-    let client: IMasterClient = new MasterClient({
-        allowRetry: true, 
-        apiUrl: config.api.url, 
-        maxConnectionAttemps: config.api.retryPolicy.maxConnectionAttempts
+client.connect().then(() => {
+    console.log('connected');
+    client.on('data', (data: string) => {
+        if (robotCommunicator.getConnectionStatus() == RobotConnectionStatus.CONNECTED) {
+            console.log(`Received command: ${data}. Sendind to robot...`);  
+            robotCommunicator.sendCommand(RobotCommand.of(data)).then(() => console.log(`command ${data} sent.`)).catch(console.error);
+        }
     });
-
-    client.connect().then(() => {
-        console.log('connected');
-        client.on('data', (data: string) => {
-            if (robotCommunicator.getConnectionStatus() == RobotConnectionStatus.CONNECTED) {
-                console.log(`Received command: ${data}. Sendind to robot...`);  
-                robotCommunicator.sendCommand(RobotCommand.of(data)).then(() => console.log(`command ${data} sent.`)).catch(console.error);
-            }
-        });
-        connectArduino(robotCommunicator);
-    }).catch(() => console.error('failed to connect'));
-}).catch(err => {
-    console.error("robot connection failed");
-    console.error(err);
-})
+    connectArduino(robotCommunicator);
+}).catch(() => console.error('failed to connect'));
 
 let connectArduino = (robotCommunicator: IRobotCommunicator<SerialCommunicationOptions>) => {
+    console.log('Establishing arduin connection');
+
     Retry.action<IRobotCommunicator<SerialCommunicationOptions>>((success, fail) => 
         robotCommunicator.connect({serialPortName: config.robot.serialPortName}).then(() => success(robotCommunicator)).catch(fail))
     .handleSuccess((attemptNo: number, communicator: IRobotCommunicator<SerialCommunicationOptions>) => {
         console.log(`arduino connection established (${attemptNo} attempts)`);
         communicator.once('close', (err?: Error) => {
-            if (err) connectArduino(robotCommunicator);
+            if (err) {
+                console.error('arduino connection unexpectibly closed with the following error:', err);
+                connectArduino(robotCommunicator);
+            }
         })
     })
     .handleTermination(() => console.log('failed to connect to arduino via serial'))
