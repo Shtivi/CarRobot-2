@@ -17,9 +17,11 @@
     "@types/es6-shim": "^0.31.39",
     "@types/raspi": "^5.0.0",
     "@types/raspi-serial": "^5.0.0",
+    "@types/serialport": "^7.0.0",
     "@types/ws": "^6.0.1",
     "raspi": "^5.0.2",
     "raspi-serial": "^5.0.0",
+    "serialport": "^7.0.2",
     "typescript": "^3.1.6",
     "ws": "^6.1.0"
   },
