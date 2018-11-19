@@ -21,7 +21,7 @@ let config: Config = ConfigLoader.loadConfig(environment);
 
 let robotCommandsMapping: RobotCommandsMapping = 
     new RobotCommandsMapping(config.robot.availableCommands);
-let robotCommunicator: IRobotCommunicator<SerialCommunicationOptions> = new ArduinoSerialCommunicator();
+let robotCommunicator: IRobotCommunicator<SerialCommunicationOptions> = new DemoSerialCommunicator();
 
 let client: IMasterClient = new MasterClient({
     allowRetry: true, 

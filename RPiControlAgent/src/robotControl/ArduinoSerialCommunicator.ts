@@ -8,11 +8,9 @@ import { EventEmitter } from 'events';
 export class ArduinoSerialCommunicator extends EventEmitter implements IRobotCommunicator<SerialCommunicationOptions> {
     private serialPort: SerialPort;
     private connectionOptions: SerialCommunicationOptions;
-    private connectionStatus: RobotConnectionStatus;
 
     public constructor() {
         super();
-        this.connectionStatus = RobotConnectionStatus.DISCONNECTED;
     }
 
     public connect(connectionOptions: SerialCommunicationOptions): Promise<void> {
@@ -24,12 +22,11 @@ export class ArduinoSerialCommunicator extends EventEmitter implements IRobotCom
                     reject(err);
                     return;
                 }
-
                 this.emit('open');
 
                 this.serialPort.on('error', (err: any) => this.emit('error', err));
                 this.serialPort.on('close', (err: any) => this.emit('close', err));
-                
+
                 resolve();
             })
         })
@@ -75,6 +72,10 @@ export class ArduinoSerialCommunicator extends EventEmitter implements IRobotCom
     }
 
     getConnectionStatus(): RobotConnectionStatus {
-        return this.connectionStatus;
+        if (this.serialPort.isOpen) {
+            return RobotConnectionStatus.CONNECTED;
+        } else {
+            return RobotConnectionStatus.DISCONNECTED;
+        }
     }
 }

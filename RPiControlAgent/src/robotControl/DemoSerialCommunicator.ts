@@ -9,7 +9,6 @@ export class DemoSerialCommunicator extends EventEmitter implements IRobotCommun
 
     public connect(connectionOptions: SerialCommunicationOptions): Promise<void> {
         this.connectionStatus = RobotConnectionStatus.CONNECTED;
-        setTimeout(() => this.emit('close', new Error('kaki')), 2000);
         return Promise.resolve();
     }    
 
