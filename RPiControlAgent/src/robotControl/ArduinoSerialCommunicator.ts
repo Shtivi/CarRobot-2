@@ -1,74 +1,66 @@
-import { IRobotCommunicator } from "./IRobotCommunicator";
-import { RobotCommand } from "./RobotCommand";
-import { init } from 'raspi';
-import { Serial } from 'raspi-serial';
-import { SerialCommunicationOptions } from "./SerialCommunicationOptions";
-import { RobotConnectionStatus } from "./RobotConnectionStatus";
+import SerialPort from 'serialport';
+import { IRobotCommunicator } from './IRobotCommunicator';
+import { SerialCommunicationOptions } from './SerialCommunicationOptions';
+import { RobotConnectionStatus } from './RobotConnectionStatus';
+import { RobotCommand } from './RobotCommand';
 
 export class ArduinoSerialCommunicator implements IRobotCommunicator<SerialCommunicationOptions> {
-    private connectionStatus: RobotConnectionStatus;
+    private serialPort: SerialPort;
     private connectionOptions: SerialCommunicationOptions;
-    private serial: Serial;
+    private connectionStatus: RobotConnectionStatus;
 
     public constructor() {
         this.connectionStatus = RobotConnectionStatus.DISCONNECTED;
     }
 
-    public getConnectionStatus(): RobotConnectionStatus {
-        return this.connectionStatus;
-    }
-
     public connect(connectionOptions: SerialCommunicationOptions): Promise<void> {
         return new Promise((resolve, reject) => {
-            init(() => {
-                this.connectionStatus = RobotConnectionStatus.CONNECTED;
-                this.connectionOptions = connectionOptions;
+            this.connectionOptions = connectionOptions;
+            this.serialPort = new SerialPort(this.connectionOptions.serialPortName, { baudRate: 9600 }, (err: Error) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
                 resolve();
-                // this.serial = new Serial({
-                //     portId: connectionOptions.serialPortName
-                // });
-
-                // this.serial.open(() => {
-                //     resolve();
-                // });
             })
-        });
+        })
     }
 
     public disconnect(): Promise<void> {
         return new Promise((resolve, reject) => {
-            this.serial.close((err: string) => {
+            if (!this.serialPort.isOpen) {
+                reject("cannot close serial port - it's not open");
+                return;
+            }
+
+            this.serialPort.close((err: Error) => {
                 if (err) {
                     reject(err);
-                } else {
-                    resolve();
+                    return;
                 }
-            });
+                resolve();
+            })
+        });
+    }
+
+    public sendCommand(command: RobotCommand): Promise<void> {
+        return new Promise((resolve, reject) => {
+            if (!this.serialPort.isOpen) {
+                reject("cannot send command: serial port is not open");
+                return;
+            }
+
+            this.serialPort.write(command.commandName, (error: any) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve();
+            })
         })
     }
 
-    sendCommand(command: RobotCommand): Promise<void> {
-        return new Promise((resolve, reject) => {
-            this.serial = new Serial({
-                portId: this.connectionOptions.serialPortName
-            });
-
-            this.serial.open(() => {
-                this.serial.write(command.commandName, () => resolve());
-            });
-            // if (this.getConnectionStatus() != RobotConnectionStatus.CONNECTED) {
-            //     reject('Cannot send command; The robot is not available.');
-            //     return;
-            // }
-            // this.serial.write(command.commandName, () => {
-            //     this.serial.flush((err: any) => {
-            //         if (err) {
-            //             reject(err);
-            //         } else {
-            //             resolve();
-            //         }
-            //     });
-            // })
-        })
+    getConnectionStatus(): RobotConnectionStatus {
+        return this.connectionStatus;
     }
 }

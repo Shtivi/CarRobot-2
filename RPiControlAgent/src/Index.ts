@@ -2,14 +2,12 @@ import ConfigLoader from './config/ConfigLoader';
 import { Config } from './config/Config';
 import { RobotCommandsMapping } from './robotControl/RobotCommandsMapping';
 import { IRobotCommunicator } from './robotControl/IRobotCommunicator';
-import { ArduinoSerialCommunicator } from './robotControl/ArduinoSerialCommunicator';
 import { SerialCommunicationOptions } from './robotControl/SerialCommunicationOptions';
 import { RobotCommand } from './robotControl/RobotCommand';
 import { DemoSerialCommunicator } from './robotControl/DemoSerialCommunicator';
-import WebSocket from 'ws';
+import { ArduinoSerialCommunicator } from './robotControl/ArduinoSerialCommunicator';
 import { MasterClient } from './client/MasterClient';
 import { IMasterClient } from './client/IMasterClient';
-import { ArduinoSerialCommunicatorV2 } from './robotControl/ArduinoSerialCommunicatorV2';
 
 console.log("starting initialization");
 const environment: string = (process.env.NODE_ENV ? process.env.NODE_ENV.trim().toUpperCase() : 'DEV');
@@ -20,7 +18,7 @@ let config: Config = ConfigLoader.loadConfig(environment);
 
 let robotCommandsMapping: RobotCommandsMapping = 
     new RobotCommandsMapping(config.robot.availableCommands);
-let robotCommunicator: IRobotCommunicator<SerialCommunicationOptions> = new ArduinoSerialCommunicatorV2();
+let robotCommunicator: IRobotCommunicator<SerialCommunicationOptions> = new ArduinoSerialCommunicator();
 
 console.log("initializing robot connection");
 robotCommunicator.connect({ serialPortName: config.robot.serialPortName }).then(() => {
