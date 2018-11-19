@@ -39,6 +39,7 @@ String nextCommand() {
 
   if (Serial.available()) {
     cmd = Serial.readStringUntil(';');
-    return cmd;
   }
+
+  return cmd;
 }

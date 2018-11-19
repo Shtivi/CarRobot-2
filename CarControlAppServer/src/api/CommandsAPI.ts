@@ -25,6 +25,8 @@ export class CommandsAPI extends BaseApiRouter {
         this.wss.clients.forEach((client: WebSocket) => {
             client.send(req.params.cmd);
         })
+        
+        console.log(`sending command: ${req.params.cmd}`);
         res.status(200).send();
     }
 
