@@ -6,4 +6,7 @@ export interface IRobotCommunicator<T> {
     disconnect(): Promise<void>;
     getConnectionStatus(): RobotConnectionStatus;
     sendCommand(command: RobotCommand): Promise<void>;
+
+    on(eventName: 'close', cb: (error?: Error) => void);
+    once(eventName: 'close', cb: (error?: Error) => void);
 }

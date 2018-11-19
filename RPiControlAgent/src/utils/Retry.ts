@@ -67,15 +67,26 @@ export class Retry<T> {
     }
 
     public run(): void {
-        // this._actionCreator;
-        // this._nextAttemptHandler.bind(this._currentObject);
-        // this._successHandler.bind(this._currentObject);
-        // this._terminationHandler.bind(this._currentObject);
+        if (!this._actionCreator) {
+            throw new Error('cannot run without an action creator');
+        }
 
-        if (this._attemptsCounter <= this._maxAttempts) {
-            this._nextAttemptHandler.bind(this._currentObject)(this._attemptsCounter++);
+        if (!this._successHandler) {
+            throw new Error('cannot run without a success handler');
+        }
+
+        if (!this._terminationHandler) {
+            throw new Error('cannot run without a termination handler');
+        }
+
+        if (!this._maxAttempts || this._attemptsCounter <= this._maxAttempts) {
+            if (this._nextAttemptHandler)
+                this._nextAttemptHandler.bind(this._currentObject)(this._attemptsCounter++);
+
             this._actionCreator.bind(this._currentObject)((data: T) => this._successHandler.bind(this._currentObject)(this._attemptsCounter, data), (err: any) => {
-                this._attemptFailureHandler.bind(this._currentObject)(this._attemptsCounter, err);
+                if (this._attemptFailureHandler) 
+                    this._attemptFailureHandler.bind(this._currentObject)(this._attemptsCounter, err);
+                    
                 setTimeout(this.run.bind(this), this._attemptsIntervalMs);
             });
         } else {

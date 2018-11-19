@@ -3,13 +3,15 @@ import { IRobotCommunicator } from './IRobotCommunicator';
 import { SerialCommunicationOptions } from './SerialCommunicationOptions';
 import { RobotConnectionStatus } from './RobotConnectionStatus';
 import { RobotCommand } from './RobotCommand';
+import { EventEmitter } from 'events';
 
-export class ArduinoSerialCommunicator implements IRobotCommunicator<SerialCommunicationOptions> {
+export class ArduinoSerialCommunicator extends EventEmitter implements IRobotCommunicator<SerialCommunicationOptions> {
     private serialPort: SerialPort;
     private connectionOptions: SerialCommunicationOptions;
     private connectionStatus: RobotConnectionStatus;
 
     public constructor() {
+        super();
         this.connectionStatus = RobotConnectionStatus.DISCONNECTED;
     }
 
@@ -18,9 +20,11 @@ export class ArduinoSerialCommunicator implements IRobotCommunicator<SerialCommu
             this.connectionOptions = connectionOptions;
             this.serialPort = new SerialPort(this.connectionOptions.serialPortName, { baudRate: 9600 }, (err: Error) => {
                 if (err) {
+                    this.emit('error', err);
                     reject(err);
                     return;
                 }
+                this.emit('open');
                 resolve();
             })
         })
@@ -29,15 +33,19 @@ export class ArduinoSerialCommunicator implements IRobotCommunicator<SerialCommu
     public disconnect(): Promise<void> {
         return new Promise((resolve, reject) => {
             if (!this.serialPort.isOpen) {
-                reject("cannot close serial port - it's not open");
+                let err: Error = new Error("cannot close serial port - it's not open");
+                this.emit('error', err)
+                reject(err);
                 return;
             }
 
             this.serialPort.close((err: Error) => {
                 if (err) {
+                    this.emit('error', err)
                     reject(err);
                     return;
                 }
+                this.emit('close');
                 resolve();
             })
         });
@@ -52,6 +60,7 @@ export class ArduinoSerialCommunicator implements IRobotCommunicator<SerialCommu
 
             this.serialPort.write(command.commandName, (error: any) => {
                 if (error) {
+                    this.emit('error', error);
                     reject(error);
                     return;
                 }
