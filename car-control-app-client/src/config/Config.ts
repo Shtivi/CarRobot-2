@@ -9,7 +9,7 @@ export interface IConfig {
 }
 
 class Config implements IConfig {
-    private serverUrl: string = "http://192.168.1.33:3000";
+    private serverUrl: string = "http://192.168.1.39:3000";
 
     public api = {
         host: this.serverUrl,

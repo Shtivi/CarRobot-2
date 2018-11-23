@@ -1,6 +1,6 @@
 #include <AFMotor.h>
 
-AF_DCMotor rightMotor(4, MOTOR12_1KHZ);
+AF_DCMotor rightMotor(4);
 AF_DCMotor leftMotor(1, MOTOR12_1KHZ);
 
 String FORWARD_CMD = "DRIVE_FORWARD";
