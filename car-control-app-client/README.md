@@ -1,4 +1,4 @@
-# car-robot-app
+# car-control-app-client
 
 ## Project setup
 ```
