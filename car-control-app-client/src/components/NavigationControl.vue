@@ -8,16 +8,21 @@
     </div>
 </template>
 
-<script>
-    export default {
-        name: 'NavigationControl',
-        props: ['side', 'controls'],
-        computed: {
-            orderedControls: function() { 
-                return this.controls.slice().sort((ctrl1, ctrl2) => ctrl1.index - ctrl2.index) 
-            }
-        }
+<script lang="ts">
+import {Component, Prop, Vue} from 'vue-property-decorator';
+import {ControlViewOption} from '../models/ControlViewOption';
+
+@Component
+export default class NavigationControl extends Vue {
+    @Prop() private side!: string;
+    @Prop() private controlOptions!: ControlViewOption[];
+
+    get orderedControls(): ControlViewOption[] {
+        if (!this.controlOptions) 
+            return [];
+        return this.controlOptions.slice().sort((ctrl1: ControlViewOption, ctrl2: ControlViewOption) => ctrl1.index - ctrl2.index);
     }
+}
 </script>
 
 <style lang="scss">

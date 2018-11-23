@@ -1,69 +1,69 @@
 <template>
-    <div class="driver-cabin">1
-        <navigation-control side='left' v-bind:controls="navigationControls.driving"></navigation-control>
-        <navigation-control side='right' v-bind:controls="navigationControls.cameraTilt"></navigation-control>
+    <div class="driver-cabin">
+        <navigation-control side='left' v-bind:controlOptions="controls.driving"></navigation-control>
+        <navigation-control side='right' v-bind:controlOptions="controls.cameraTilt"></navigation-control>
     </div>
 </template>
 
-<script>
-import NavigationControl from './NavigationControl';
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+import NavigationControl from './NavigationControl.vue';
+import { ControlViewOption } from '@/models/ControlViewOption';
 
-export default {
-    name: 'DriverCabin',
-    components: {
-        NavigationControl
-    },
-    data() {
+@Component({
+    components: {NavigationControl}
+})
+export default class DriverCabin extends Vue {
+    get controls(): { driving: ControlViewOption[], cameraTilt: ControlViewOption[] } {
         return {
-            navigationControls: {
-                driving: [
-                    {
-                        icon: 'arrow_right',
-                        index: 1,
-                        action: ''
-                    }, 
-                    {
-                        icon: 'arrow_drop_down',
-                        index: 2,
-                        action: ''
-                    }, 
-                    {
-                        icon: 'arrow_left',
-                        index: 3,
-                        action: ''
-                    }, 
-                    {
-                        icon: 'arrow_drop_up',
-                        index: 4,
-                        action: ''
-                    }
-                ],
-                cameraTilt: [
-                    {
-                        icon: 'arrow_right',
-                        index: 1,
-                        action: ''
-                    }, 
-                    {
-                        icon: 'arrow_drop_down',
-                        index: 2,
-                        action: ''
-                    }, 
-                    {
-                        icon: 'arrow_left',
-                        index: 3,
-                        action: ''
-                    }, 
-                    {
-                        icon: 'arrow_drop_up',
-                        index: 4,
-                        action: ''
-                    }
-                ]
-            }
+            driving: [
+                {
+                    icon: 'arrow_right',
+                    index: 1,
+                    action: ''
+                }, 
+                {
+                    icon: 'arrow_drop_down',
+                    index: 2,
+                    action: ''
+                }, 
+                {
+                    icon: 'arrow_left',
+                    index: 3,
+                    action: ''
+                }, 
+                {
+                    icon: 'arrow_drop_up',
+                    index: 4,
+                    action: ''
+                }
+            ],
+            cameraTilt: [
+                {
+                    icon: 'arrow_right',
+                    index: 1,
+                    action: ''
+                }, 
+                {
+                    icon: 'arrow_drop_down',
+                    index: 2,
+                    action: ''
+                }, 
+                {
+                    icon: 'arrow_left',
+                    index: 3,
+                    action: ''
+                }, 
+                {
+                    icon: 'arrow_drop_up',
+                    index: 4,
+                    action: ''
+                }
+            ]
         }
     }
 }
+
 </script>
 
 <style lang="scss">

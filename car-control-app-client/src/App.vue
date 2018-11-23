@@ -1,18 +1,19 @@
 <template>
   <div id="app">
-    <driver-cabin></driver-cabin>
+    <DriverCabin />
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
 import DriverCabin from './components/DriverCabin.vue';
 
-export default {
-  name: 'app',
+@Component({
   components: {
-    DriverCabin
-  }
-}
+    DriverCabin,
+  },
+})
+export default class App extends Vue {}
 </script>
 
 <style lang="scss">
@@ -22,6 +23,5 @@ export default {
 //   -moz-osx-font-smoothing: grayscale;
 //   text-align: center;
 //   color: #2c3e50;
-//   margin-top: 60px;
 // }
 </style>
