@@ -1,7 +1,7 @@
 <template>
     <div class="navigation-control" v-bind:class="{'right': side == 'right' || !side, 'left': side == 'left'}">
         <div class="controls-container">
-            <span v-for="(control, index) in controls" :key="index">
+            <span v-for="(control, index) in orderedControls" :key="index">
                 <md-icon>{{control.icon}}</md-icon>
             </span>
         </div>
@@ -12,9 +12,9 @@
     export default {
         name: 'NavigationControl',
         props: ['side', 'controls'],
-        data() {
-            return {
-                
+        computed: {
+            orderedControls: function() { 
+                return this.controls.slice().sort((ctrl1, ctrl2) => ctrl1.index - ctrl2.index) 
             }
         }
     }
@@ -92,9 +92,14 @@
 
     .controls-container {
         @include on-circle($item-count: 4, $circle-size: $container-size, $item-size: 24px);
-        // background-color: #fff;
         span {
+            font-size: 20px;
             display: block;
+
+            .md-icon {
+                font-size:44px!important;
+                color: #222;
+            }
         }
     }
 }

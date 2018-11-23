@@ -18,34 +18,46 @@ export default {
             navigationControls: {
                 driving: [
                     {
-                        icon: 'keyboard_arrow_up',
-                        index: 1
+                        icon: 'arrow_right',
+                        index: 1,
+                        action: ''
                     }, 
                     {
-                        icon: 'thumb_up',
-                        index: 2
+                        icon: 'arrow_drop_down',
+                        index: 2,
+                        action: ''
                     }, 
                     {
-                        icon: 'thumb_up',
-                        index: 3
+                        icon: 'arrow_left',
+                        index: 3,
+                        action: ''
                     }, 
                     {
-                        icon: 'thumb_up',
-                        index: 4
+                        icon: 'arrow_drop_up',
+                        index: 4,
+                        action: ''
                     }
                 ],
                 cameraTilt: [
                     {
-                        icon: ''
+                        icon: 'arrow_right',
+                        index: 1,
+                        action: ''
                     }, 
                     {
-                        icon: ''
+                        icon: 'arrow_drop_down',
+                        index: 2,
+                        action: ''
                     }, 
                     {
-                        icon: ''
+                        icon: 'arrow_left',
+                        index: 3,
+                        action: ''
                     }, 
                     {
-                        icon: ''
+                        icon: 'arrow_drop_up',
+                        index: 4,
+                        action: ''
                     }
                 ]
             }
@@ -56,7 +68,7 @@ export default {
 
 <style lang="scss">
 .driver-cabin {
-    background-image: url('../assets/images.jpg');
+    background-image: url('../assets/IMG_0020b.jpg');
     background-repeat: no-repeat;
     background-size: cover;
     width: 100%;
