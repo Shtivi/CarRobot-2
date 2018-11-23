@@ -21,7 +21,8 @@ let config: Config = ConfigLoader.loadConfig(environment);
 
 let robotCommandsMapping: RobotCommandsMapping = 
     new RobotCommandsMapping(config.robot.availableCommands);
-let robotCommunicator: IRobotCommunicator<SerialCommunicationOptions> = (environment == "DEV") ? new DemoSerialCommunicator() : new ArduinoSerialCommunicator();
+let robotCommunicator: IRobotCommunicator<SerialCommunicationOptions> = 
+    (environment == "DEV") ? new DemoSerialCommunicator() : new ArduinoSerialCommunicator();
 
 let client: IMasterClient = new MasterClient({
     allowRetry: true, 
@@ -49,7 +50,7 @@ let connectArduino = (robotCommunicator: IRobotCommunicator<SerialCommunicationO
         console.log(`arduino connection established (${attemptNo} attempts)`);
         communicator.once('close', (err?: Error) => {
             if (err) {
-                console.error('arduino connection unexpectibly closed with the following error:', err);
+                console.error('arduino connection unexpectedly closed with the following error:', err);
                 connectArduino(robotCommunicator);
             }
         })

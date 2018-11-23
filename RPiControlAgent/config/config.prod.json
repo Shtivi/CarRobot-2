@@ -2,7 +2,7 @@
     "robot": {
         "availableCommands": [
             "DRIVE_FOWARD",
-            "DRIVE_BACKWARDS",
+            "DRIVE_BACKWARD",
             "STOP",
             "TURN_LEFT",
             "TURN_RIGHT"

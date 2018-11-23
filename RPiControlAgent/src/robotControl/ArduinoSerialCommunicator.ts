@@ -66,7 +66,10 @@ export class ArduinoSerialCommunicator extends EventEmitter implements IRobotCom
                     reject(error);
                     return;
                 }
-                resolve();
+                this.serialPort.drain(err => {
+                    if (err) reject(err);
+                    else resolve();
+                })
             })
         })
     }
