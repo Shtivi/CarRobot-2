@@ -4,6 +4,7 @@ import ConfigLoader from './config/ConfigLoader';
 import * as WebSocket from 'ws';
 import { CommandsAPI } from './api/CommandsAPI';
 import { IRouter } from 'express-serve-static-core';
+import { NextFunction } from 'connect';
 
 console.log("starting server initialization");
 const environment: string = (process.env.NODE_ENV ? process.env.NODE_ENV.trim().toUpperCase() : 'PROD');
@@ -28,7 +29,14 @@ console.log("booting up http server");
 const app: express.Application = express();
 
 const generalRouter: IRouter = Router();
-generalRouter.use('/commands', [new CommandsAPI(robotWsServer).router()]);
+generalRouter
+    .use((req, res, next) => {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+        next();
+    })
+    .use('/commands', [new CommandsAPI(robotWsServer).router()]);
 app.use('/api', generalRouter);
 
 app.listen(config.httpServer.port, () => {

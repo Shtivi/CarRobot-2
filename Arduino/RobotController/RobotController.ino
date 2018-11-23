@@ -1,11 +1,13 @@
 #include <AFMotor.h>
 
-AF_DCMotor rightMotor(1, MOTOR12_64KHZ);
-AF_DCMotor leftMotor(2, MOTOR12_64KHZ);
+AF_DCMotor rightMotor(4, MOTOR12_1KHZ);
+AF_DCMotor leftMotor(1, MOTOR12_1KHZ);
 
 String FORWARD_CMD = "DRIVE_FORWARD";
 String BACKWARD_CMD = "DRIVE_BACKWARD";
-String STOP_CMD = "STOP";
+String STOP_CMD = "STOP_DRIVING";
+String TURN_LEFT_CMD = "TURN_LEFT";
+String TURN_RIGHT_CMD = "TURN_RIGHT";
 
 String currentCmd = "";
 
@@ -31,6 +33,12 @@ void loop() {
   } else if (currentCmd.equals(BACKWARD_CMD)) {
     rightMotor.run(BACKWARD);  
     leftMotor.run(BACKWARD);
+  } else if (currentCmd.equals(TURN_LEFT_CMD)) {
+    rightMotor.run(FORWARD);
+    leftMotor.run(RELEASE);
+  } else if (currentCmd.equals(TURN_RIGHT_CMD)) {
+    rightMotor.run(RELEASE);
+    leftMotor.run(FORWARD);
   }
 }
 

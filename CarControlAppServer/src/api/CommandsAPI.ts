@@ -10,6 +10,8 @@ export class CommandsAPI extends BaseApiRouter {
     }
 
     private handleCommand(req: Request, res: Response): void {
+        console.log(`received command: ${req.params.cmd}`);
+        
         if (!this.wss) {
             res.status(500).send("No web socket server defined");
             return;

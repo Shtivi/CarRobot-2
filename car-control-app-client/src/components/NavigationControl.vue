@@ -1,7 +1,8 @@
 <template>
     <div class="navigation-control" v-bind:class="{'right': side == 'right' || !side, 'left': side == 'left'}">
         <div class="controls-container">
-            <span v-for="(control, index) in orderedControls" :key="index">
+            <span v-for="(control, index) in orderedControls" :key="index" 
+                v-on:touchstart="controlButtonDown(control.action)" v-on:touchend="controlButtonUp(control.action)" v-on:touchcancel="controlButtonUp(control.action)"> 
                 <md-icon>{{control.icon}}</md-icon>
             </span>
         </div>
@@ -10,17 +11,35 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
-import {ControlViewOption} from '../models/ControlViewOption';
+import {ControlViewOption} from '@/models/ControlViewOption';
+import { ControlOptions } from '@/models/ControlOptions';
+import { CommandsDispatcherApi } from '@/services/CommandsDispatcherApi';
 
 @Component
 export default class NavigationControl extends Vue {
     @Prop() private side!: string;
-    @Prop() private controlOptions!: ControlViewOption[];
+    @Prop() private controlOptions!: ControlOptions;
+    @Prop() private commandsDispatcher!: CommandsDispatcherApi;
 
     get orderedControls(): ControlViewOption[] {
         if (!this.controlOptions) 
             return [];
-        return this.controlOptions.slice().sort((ctrl1: ControlViewOption, ctrl2: ControlViewOption) => ctrl1.index - ctrl2.index);
+        return this.controlOptions.controls.slice().sort((ctrl1: ControlViewOption, ctrl2: ControlViewOption) => ctrl1.index - ctrl2.index);
+    }
+
+    private controlButtonDown(command: string): void {
+        this.sendCommand(command);
+    }
+
+    private controlButtonUp(command: string): void {
+        this.sendCommand(this.controlOptions.stopCommand);
+    }
+
+    private sendCommand(command: string): void {    
+        this.commandsDispatcher.sendCommand(command).catch((err) => {
+            console.error(err);
+            alert("error sending command");
+        })
     }
 }
 </script>
