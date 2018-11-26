@@ -22,9 +22,7 @@ var events_1 = require("events");
 var ArduinoSerialCommunicator = /** @class */ (function (_super) {
     __extends(ArduinoSerialCommunicator, _super);
     function ArduinoSerialCommunicator() {
-        var _this = _super.call(this) || this;
-        _this.connectionStatus = RobotConnectionStatus_1.RobotConnectionStatus.DISCONNECTED;
-        return _this;
+        return _super.call(this) || this;
     }
     ArduinoSerialCommunicator.prototype.connect = function (connectionOptions) {
         var _this = this;
@@ -37,6 +35,8 @@ var ArduinoSerialCommunicator = /** @class */ (function (_super) {
                     return;
                 }
                 _this.emit('open');
+                _this.serialPort.on('error', function (err) { return _this.emit('error', err); });
+                _this.serialPort.on('close', function (err) { return _this.emit('close', err); });
                 resolve();
             });
         });
@@ -74,12 +74,22 @@ var ArduinoSerialCommunicator = /** @class */ (function (_super) {
                     reject(error);
                     return;
                 }
-                resolve();
+                _this.serialPort.drain(function (err) {
+                    if (err)
+                        reject(err);
+                    else
+                        resolve();
+                });
             });
         });
     };
     ArduinoSerialCommunicator.prototype.getConnectionStatus = function () {
-        return this.connectionStatus;
+        if (this.serialPort.isOpen) {
+            return RobotConnectionStatus_1.RobotConnectionStatus.CONNECTED;
+        }
+        else {
+            return RobotConnectionStatus_1.RobotConnectionStatus.DISCONNECTED;
+        }
     };
     return ArduinoSerialCommunicator;
 }(events_1.EventEmitter));

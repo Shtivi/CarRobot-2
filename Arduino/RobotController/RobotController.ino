@@ -1,7 +1,7 @@
 #include <AFMotor.h>
 
 AF_DCMotor rightMotor(4);
-AF_DCMotor leftMotor(1, MOTOR12_1KHZ);
+AF_DCMotor leftMotor(1);
 
 String FORWARD_CMD = "DRIVE_FORWARD";
 String BACKWARD_CMD = "DRIVE_BACKWARD";
@@ -19,6 +19,8 @@ void setup() {
 
   leftMotor.setSpeed(255);
   leftMotor.run(RELEASE);
+
+  Serial.write("READY");
 }
 
 void loop() {

@@ -11,6 +11,8 @@ import { IMasterClient } from './client/IMasterClient';
 import { Retry } from './utils/Retry';
 import { ConnectionStatus } from './client/ConnectionStatus';
 import { RobotConnectionStatus } from './robotControl/RobotConnectionStatus';
+import * as ChildProcess from 'child_process';
+import * as path from 'path';
 
 console.log("starting initialization");
 const environment: string = (process.env.NODE_ENV ? process.env.NODE_ENV.trim().toUpperCase() : 'DEV');
@@ -29,6 +31,19 @@ let client: IMasterClient = new MasterClient({
     apiUrl: config.api.url, 
     maxConnectionAttemps: config.api.retryPolicy.maxConnectionAttempts
 });
+
+var p = path.join(__dirname, '../external/serialCommunicator.py');
+var py = ChildProcess.spawn('python', [p, 'hi', '23123'], {
+    env: {"port": "/dev/arduino"}
+})
+py.stdout.on('data', (data: Uint8Array) => {
+    console.log(data.toString())
+});
+py.stdin.on('close', () => console.log("closed"));
+py.stderr.on('data', (err: Uint8Array) => console.error(err.toString()));
+// setTimeout(() => {
+//     py.stdin.write("hello\n\r");
+// }, 1000);
 
 client.connect().then(() => {
     console.log('connected');
