@@ -1,10 +1,17 @@
 import { IRobotCommunicator } from "./IRobotCommunicator";
 import { RobotCommand } from "./RobotCommand";
 import { RobotConnectionStatus } from "./RobotConnectionStatus";
+import { SerialCommunicationOptions } from "./SerialCommunicationOptions";
+import { EventEmitter } from "events";
 
-export class SerialProxyCommunicator implements IRobotCommunicator<void> {
+export class SerialProxyCommunicator extends EventEmitter implements IRobotCommunicator<SerialCommunicationOptions> {
+    private connectionOptions: SerialCommunicationOptions;
 
-    connect(connectionOptions: void): Promise<void> {
+    public constructor() {
+        super();
+    }
+
+    connect(connectionOptions: SerialCommunicationOptions): Promise<void> {
         throw new Error("Method not implemented.");
     }    
     
