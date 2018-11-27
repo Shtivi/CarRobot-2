@@ -27,8 +27,9 @@ export class SerialProxyCommunicator extends EventEmitter implements IRobotCommu
                 }
             });
 
-            this.pythonProcess.stdout.once('data', (data: Uint8Array) => {
-                if (data.toString() == 'READY') {
+            this.pythonProcess.stdout.once('data', (buffer: Uint8Array) => {
+                let data: string = buffer.toString();
+                if (data == 'READY') {
                     this.pythonProcess.stdout.on('data', (data: Uint8Array) => {
                         console.log(data.toString());
                     });
@@ -52,7 +53,7 @@ export class SerialProxyCommunicator extends EventEmitter implements IRobotCommu
     }    
     
     disconnect(): Promise<void> {
-        if (this.connectionStatus == RobotConnectionStatus.CONNECTED) {
+        if (this.getConnectionStatus() == RobotConnectionStatus.CONNECTED) {
             return new Promise((resolve, reject) => {
                 this.pythonProcess.once('close', (code: number, signal: string) => {
                     resolve();
@@ -70,7 +71,7 @@ export class SerialProxyCommunicator extends EventEmitter implements IRobotCommu
 
     sendCommand(command: RobotCommand): Promise<void> {
         return new Promise((resolve, reject) => {
-            if (this.connectionStatus == RobotConnectionStatus.CONNECTED) {
+            if (this.getConnectionStatus() == RobotConnectionStatus.CONNECTED) {
                 this.pythonProcess.stdin.write(command.commandName + '\n\r', (error: Error) => {
                     if (error) {
                         reject(error);

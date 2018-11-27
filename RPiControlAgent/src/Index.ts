@@ -34,19 +34,6 @@ let client: IMasterClient = new MasterClient({
     maxConnectionAttemps: config.api.retryPolicy.maxConnectionAttempts
 });
 
-
-// var py = ChildProcess.spawn('python', [p, 'hi', '23123'], {
-//     env: {"port": "/dev/arduino"}
-// })
-// py.stdout.on('data', (data: Uint8Array) => {
-//     console.log(data.toString())
-// });
-// py.stdin.on('close', () => console.log("closed"));
-// py.stderr.on('data', (err: Uint8Array) => console.error(err.toString()));
-// setTimeout(() => {
-//     py.stdin.write("hello\n\r");
-// }, 1000);
-
 client.connect().then(() => {
     console.log('connected');
     client.on('data', (data: string) => {
@@ -59,7 +46,7 @@ client.connect().then(() => {
 }).catch(() => console.error('failed to connect'));
 
 const connectArduino = (robotCommunicator: IRobotCommunicator<SerialCommunicationOptions>) => {
-    console.log('Establishing arduin connection');
+    console.log('Establishing arduino connection');
 
     Retry.action<IRobotCommunicator<SerialCommunicationOptions>>((success, fail) => 
         robotCommunicator.connect({serialPortName: config.robot.serialPortName}).then(() => success(robotCommunicator)).catch(fail))
@@ -70,6 +57,9 @@ const connectArduino = (robotCommunicator: IRobotCommunicator<SerialCommunicatio
                 console.error('arduino connection unexpectedly closed with the following error:', err);
                 connectArduino(robotCommunicator);
             }
+        });
+        communicator.on('error', (reason: any) => {
+            console.error("communicator rasied an error", reason);
         })
     })
     .handleTermination(() => console.log('failed to connect to arduino via serial'))

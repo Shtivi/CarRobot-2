@@ -1,15 +1,20 @@
 import sys
 import os
 import time 
+import json
+# import serial
 
-time.sleep(1)
+# serial = serial.Serial(os.environ['port'])
+
 sys.stdout.write("READY")
 sys.stdout.flush()
 
-# time.sleep(2)
-# sys.stdout.write("ggg")
-# sys.stdout.flush()
 while True:
     data = sys.stdin.readline()
-    sys.stdout.write(data)
-    sys.stdout.flush()
+    try:
+        if len(data) > 0:
+            raise Exception('got an input!')
+            # ser.write(data)
+    except Exception as err:
+        sys.stderr.write(json.dumps({"error": str(err)}))
+        sys.stderr.flush()
