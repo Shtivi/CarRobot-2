@@ -15,8 +15,10 @@
   "license": "ISC",
   "dependencies": {
     "@types/es6-shim": "^0.31.39",
+    "@types/log4js": "^2.3.5",
     "@types/serialport": "^7.0.0",
     "@types/ws": "^6.0.1",
+    "log4js": "^3.0.6",
     "serialport": "^7.0.2",
     "typescript": "^3.1.6",
     "ws": "^6.1.0"
