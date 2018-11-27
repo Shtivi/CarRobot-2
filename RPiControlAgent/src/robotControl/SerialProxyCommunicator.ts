@@ -26,12 +26,4 @@ export class SerialProxyCommunicator extends EventEmitter implements IRobotCommu
     sendCommand(command: RobotCommand): Promise<void> {
         throw new Error("Method not implemented.");
     }
-
-    on(eventName: "close", cb: (error?: Error | undefined) => void) {
-        throw new Error("Method not implemented.");
-    }
-
-    once(eventName: "close", cb: (error?: Error | undefined) => void) {
-        throw new Error("Method not implemented.");
-    }
 }
