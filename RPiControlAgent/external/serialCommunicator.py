@@ -2,13 +2,14 @@ import sys
 import os
 import time 
 
-time.sleep(1);
-print("READY")
-print(str(sys.argv))
-print(os.environ['port'])
+time.sleep(1)
+sys.stdout.write("READY")
 sys.stdout.flush()
 
+# time.sleep(2)
+# sys.stdout.write("ggg")
+# sys.stdout.flush()
 while True:
     data = sys.stdin.readline()
-    print("you said ", data)
+    sys.stdout.write(data)
     sys.stdout.flush()

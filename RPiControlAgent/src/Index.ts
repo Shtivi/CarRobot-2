@@ -11,8 +11,8 @@ import { IMasterClient } from './client/IMasterClient';
 import { Retry } from './utils/Retry';
 import { ConnectionStatus } from './client/ConnectionStatus';
 import { RobotConnectionStatus } from './robotControl/RobotConnectionStatus';
-import * as ChildProcess from 'child_process';
 import * as path from 'path';
+import { SerialProxyCommunicator } from './robotControl/SerialProxyCommunicator';
 
 console.log("starting initialization");
 const environment: string = (process.env.NODE_ENV ? process.env.NODE_ENV.trim().toUpperCase() : 'DEV');
@@ -24,7 +24,9 @@ let config: Config = ConfigLoader.loadConfig(environment);
 let robotCommandsMapping: RobotCommandsMapping = 
     new RobotCommandsMapping(config.robot.availableCommands);
 let robotCommunicator: IRobotCommunicator<SerialCommunicationOptions> = 
-    (environment == "DEV") ? new DemoSerialCommunicator() : new ArduinoSerialCommunicator();
+    (environment == "DEV") ? 
+        new SerialProxyCommunicator(path.join(__dirname, '../external/serialCommunicator.py')) : 
+        new ArduinoSerialCommunicator();
 
 let client: IMasterClient = new MasterClient({
     allowRetry: true, 
@@ -32,15 +34,15 @@ let client: IMasterClient = new MasterClient({
     maxConnectionAttemps: config.api.retryPolicy.maxConnectionAttempts
 });
 
-var p = path.join(__dirname, '../external/serialCommunicator.py');
-var py = ChildProcess.spawn('python', [p, 'hi', '23123'], {
-    env: {"port": "/dev/arduino"}
-})
-py.stdout.on('data', (data: Uint8Array) => {
-    console.log(data.toString())
-});
-py.stdin.on('close', () => console.log("closed"));
-py.stderr.on('data', (err: Uint8Array) => console.error(err.toString()));
+
+// var py = ChildProcess.spawn('python', [p, 'hi', '23123'], {
+//     env: {"port": "/dev/arduino"}
+// })
+// py.stdout.on('data', (data: Uint8Array) => {
+//     console.log(data.toString())
+// });
+// py.stdin.on('close', () => console.log("closed"));
+// py.stderr.on('data', (err: Uint8Array) => console.error(err.toString()));
 // setTimeout(() => {
 //     py.stdin.write("hello\n\r");
 // }, 1000);
@@ -56,7 +58,7 @@ client.connect().then(() => {
     connectArduino(robotCommunicator);
 }).catch(() => console.error('failed to connect'));
 
-let connectArduino = (robotCommunicator: IRobotCommunicator<SerialCommunicationOptions>) => {
+const connectArduino = (robotCommunicator: IRobotCommunicator<SerialCommunicationOptions>) => {
     console.log('Establishing arduin connection');
 
     Retry.action<IRobotCommunicator<SerialCommunicationOptions>>((success, fail) => 
