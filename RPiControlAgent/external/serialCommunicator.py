@@ -2,9 +2,9 @@ import sys
 import os
 import time 
 import json
-# import serial
+import serial
 
-# serialPort = serial.Serial(os.environ['port'])
+serialPort = serial.Serial(os.environ['port'])
 
 sys.stdout.write("READY")
 sys.stdout.flush()
