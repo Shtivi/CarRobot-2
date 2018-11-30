@@ -25,8 +25,8 @@ let robotCommandsMapping: RobotCommandsMapping =
     new RobotCommandsMapping(config.robot.availableCommands);
 let robotCommunicator: IRobotCommunicator<SerialCommunicationOptions> = 
     (environment == "DEV") ? 
-        new SerialProxyCommunicator(path.join(__dirname, '../external/serialCommunicator.py')) : 
-        new ArduinoSerialCommunicator();
+        new  DemoSerialCommunicator() : 
+        new SerialProxyCommunicator(path.join(__dirname, '../external/serialCommunicator.py'));
 
 let client: IMasterClient = new MasterClient({
     allowRetry: true, 
