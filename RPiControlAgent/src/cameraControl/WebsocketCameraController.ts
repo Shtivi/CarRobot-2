@@ -11,8 +11,8 @@ export class WebsocketCameraController implements ICameraController {
             let self = this;
             this.websocketClient = new WebSocket(wssUrl, { headers: { "isCamera": "true" } });
             this.websocketClient.on('open', () => {
-                self = raspividStream();
-                self.websocketClient.on('data', (data) => {
+                self.stream = raspividStream();
+                self.stream.on('data', (data) => {
                     self.websocketClient.send(data, {binary:true}, (err: Error) => console.error(err));
                 })
                 resolve();
