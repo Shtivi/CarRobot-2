@@ -19,6 +19,7 @@
     "@types/serialport": "^7.0.0",
     "@types/ws": "^6.0.1",
     "log4js": "^3.0.6",
+    "raspivid-stream": "^0.2.1",
     "serialport": "^7.0.2",
     "typescript": "^3.1.6",
     "ws": "^6.1.0"
