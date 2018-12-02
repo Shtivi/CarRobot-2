@@ -13,6 +13,8 @@ import { ConnectionStatus } from './client/ConnectionStatus';
 import { RobotConnectionStatus } from './robotControl/RobotConnectionStatus';
 import * as path from 'path';
 import { SerialProxyCommunicator } from './robotControl/SerialProxyCommunicator';
+import { ICameraController } from './cameraControl/ICameraController';
+import { WebsocketCameraController } from './cameraControl/WebsocketCameraController';
 
 console.log("starting initialization");
 const environment: string = (process.env.NODE_ENV ? process.env.NODE_ENV.trim().toUpperCase() : 'DEV');
@@ -25,7 +27,7 @@ let robotCommandsMapping: RobotCommandsMapping =
     new RobotCommandsMapping(config.robot.availableCommands);
 let robotCommunicator: IRobotCommunicator<SerialCommunicationOptions> = 
     (environment == "DEV") ? 
-        new  DemoSerialCommunicator() : 
+        new DemoSerialCommunicator() : 
         new SerialProxyCommunicator(path.join(__dirname, '../external/serialCommunicator.py'));
 
 let client: IMasterClient = new MasterClient({
@@ -33,6 +35,9 @@ let client: IMasterClient = new MasterClient({
     apiUrl: config.api.url, 
     maxConnectionAttemps: config.api.retryPolicy.maxConnectionAttempts
 });
+
+let cameraStreamer: ICameraController = new WebsocketCameraController();
+cameraStreamer.startStreaming("ws://localhost:3002/stream").then(() => console.log("starting to stream video")).catch(err => console.error(err));
 
 client.connect().then(() => {
     console.log('connected');
