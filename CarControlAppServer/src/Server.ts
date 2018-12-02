@@ -5,6 +5,7 @@ import * as WebSocket from 'ws';
 import { CommandsAPI } from './api/CommandsAPI';
 import { IRouter } from 'express-serve-static-core';
 import { NextFunction } from 'connect';
+import { IncomingMessage } from 'http';
 
 console.log("starting server initialization");
 const environment: string = (process.env.NODE_ENV ? process.env.NODE_ENV.trim().toUpperCase() : 'PROD');
@@ -20,9 +21,26 @@ const robotWsServer = new WebSocket.Server({
     path: config.robotWsServer.path
 }, () => {
     console.log(`robot web socket server is listenning at: ws://localhost:${config.robotWsServer.port}${config.robotWsServer.path}`);
-    robotWsServer.on('connection', (connection: WebSocket) => {
-        console.log("connection");
+    robotWsServer.on('connection', (connection: WebSocket, request: IncomingMessage) => {
+        console.log("robot connection");
     });
+})
+
+const streamWsServer = new WebSocket.Server({
+    port: 3002,
+    path: '/stream'
+}, () => {
+    console.log('streaming websocket server is listenning at: ws://localhost:3002/stream');
+    streamWsServer.on('connection', (connection: WebSocket, request: IncomingMessage) => {
+        if (request.headers['iscamera']) {
+            console.log('camera streamer connected');
+            connection.on('message', (data: WebSocket.Data) => {
+                console.log("got data!");
+            })
+        } else {
+            console.log("streaming client connected");
+        }
+    })
 })
 
 console.log("booting up http server");
