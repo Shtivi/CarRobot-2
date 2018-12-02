@@ -37,7 +37,7 @@ let client: IMasterClient = new MasterClient({
 });
 
 let cameraStreamer: ICameraController = new WebsocketCameraController();
-cameraStreamer.startStreaming("ws://192.168.1.44:3002/stream").then(() => console.log("starting to stream video")).catch(err => console.error(err));
+cameraStreamer.startStreaming("ws://192.168.1.44:3002/stream").then(() => console.log("starting to stream video")).catch(err => console.error("error in streaming", err));
 
 client.connect().then(() => {
     console.log('connected');

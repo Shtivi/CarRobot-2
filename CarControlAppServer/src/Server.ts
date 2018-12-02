@@ -35,7 +35,11 @@ const streamWsServer = new WebSocket.Server({
         if (request.headers['iscamera']) {
             console.log('camera streamer connected');
             connection.on('message', (data: WebSocket.Data) => {
-                console.log("got data!");
+                streamWsServer.clients.forEach((client: WebSocket) => {
+                    if (client != connection) {
+                        client.send(data, {binary: true})
+                    }
+                })
             })
         } else {
             console.log("streaming client connected");
