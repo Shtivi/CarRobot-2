@@ -7,7 +7,7 @@ export class ProcessCameraControl extends events.EventEmitter implements ICamera
     private options: CameraOptions;
     private raspividProcess: Process.ChildProcess;
 
-    public constructor() {
+    public constructor(private captureScriptPath: string) {
         super();
     }
 
@@ -37,11 +37,30 @@ export class ProcessCameraControl extends events.EventEmitter implements ICamera
 
     public stopStreaming(): Promise<void> {
         return new Promise((resolve, reject) => {
-            
+            if (!this.raspividProcess || this.raspividProcess.killed || !this.raspividProcess.connected) {
+                reject("no streaming to stop");
+                return;
+            }
+
+            this.raspividProcess.once('close', (code: number, signal: string) => {
+                resolve();
+            })
+            this.raspividProcess.kill('SIGINT')
         })
     }
 
-    public capture(): string {
-        return "";
+    public capture(width: number, height: number): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const captureProcess: Process.ChildProcess = 
+                Process.spawn('python', [this.captureScriptPath, width.toString(), height.toString()]);
+            
+            process.stdout.once('data', (data: any) => {
+                resolve(data);
+            });
+            
+            process.stderr.once('data', (err: any) => {
+                reject(err);
+            })
+        });
     }
 }
