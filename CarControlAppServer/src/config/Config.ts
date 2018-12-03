@@ -7,4 +7,8 @@ export class Config {
         port: number,
         path: string
     };
+
+    public liveStreamingReceiver: {
+        port: number
+    }
 }
