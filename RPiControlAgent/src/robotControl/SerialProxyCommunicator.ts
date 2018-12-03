@@ -72,7 +72,7 @@ export class SerialProxyCommunicator extends EventEmitter implements IRobotCommu
     sendCommand(command: RobotCommand): Promise<void> {
         return new Promise((resolve, reject) => {
             if (this.getConnectionStatus() == RobotConnectionStatus.CONNECTED) {
-                this.pythonProcess.stdin.write(command.commandName + '\n\r', (error: Error) => {
+                this.pythonProcess.stdin.write(command.commandName + ';\n\r', (error: Error) => {
                     if (error) {
                         reject(error);
                         return;

@@ -7,6 +7,7 @@ import { IRouter } from 'express-serve-static-core';
 import { NextFunction } from 'connect';
 import { ILiveStreamReceiver } from './api/liveStreamReceiver/ILiveStreamReceiver';
 import { LiveStreamTcpReceiver } from './api/liveStreamReceiver/LiveStreamTcpReceiver';
+import { IncomingMessage } from 'http';
 
 console.log("starting server initialization");
 const environment: string = (process.env.NODE_ENV ? process.env.NODE_ENV.trim().toUpperCase() : 'PROD');
@@ -18,8 +19,8 @@ const config: Config = ConfigLoader.loadConfig(environment);
 console.log("booting up robot web socket server");
 const robotWsServer = new WebSocket.Server({ port: config.robotWsServer.port, path: config.robotWsServer.path}, () => {
     console.log(`robot web socket server is listenning at: ws://localhost:${config.robotWsServer.port}${config.robotWsServer.path}`);
-    robotWsServer.on('connection', (connection: WebSocket) => {
-        console.log("connection");
+    robotWsServer.on('connection', (connection: WebSocket, request: IncomingMessage) => {
+        console.log("robot connection");
     });
 })
 
@@ -46,8 +47,29 @@ const liveStreamingServer = new WebSocket.Server({ port: 3004, path: '/streaming
                 });
             }
         });
-    })
-})
+    });
+});
+
+// const streamWsServer = new WebSocket.Server({
+//     port: 3002,
+//     path: '/stream'
+// }, () => {
+//     console.log('streaming websocket server is listenning at: ws://localhost:3002/stream');
+//     streamWsServer.on('connection', (connection: WebSocket, request: IncomingMessage) => {
+//         if (request.headers['iscamera']) {
+//             console.log('camera streamer connected');
+//             connection.on('message', (data: WebSocket.Data) => {
+//                 streamWsServer.clients.forEach((client: WebSocket) => {
+//                     if (client != connection) {
+//                         client.send(data, {binary: true})
+//                     }
+//                 })
+//             })
+//         } else {
+//             console.log("streaming client connected");
+//         }
+//     })
+// })
 
 console.log("booting up http server");
 const app: express.Application = express();

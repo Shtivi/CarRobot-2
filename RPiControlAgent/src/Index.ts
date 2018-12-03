@@ -14,6 +14,8 @@ import { RobotConnectionStatus } from './robotControl/RobotConnectionStatus';
 import * as path from 'path';
 import { SerialProxyCommunicator } from './robotControl/SerialProxyCommunicator';
 import * as Log4js from 'log4js';
+import { ICameraController } from './cameraControl/ICameraController';
+import { WebsocketCameraController } from './cameraControl/WebsocketCameraController';
 
 Log4js.configure(new Date().toTimeString());
 let logger: Log4js.Logger = Log4js.getLogger();
@@ -29,14 +31,17 @@ let robotCommandsMapping: RobotCommandsMapping =
     new RobotCommandsMapping(config.robot.availableCommands);
 let robotCommunicator: IRobotCommunicator<SerialCommunicationOptions> = 
     (environment == "DEV") ? 
-        new SerialProxyCommunicator(path.join(__dirname, '../external/serialCommunicator.py')) : 
-        new ArduinoSerialCommunicator();
+        new DemoSerialCommunicator() : 
+        new SerialProxyCommunicator(path.join(__dirname, '../external/serialCommunicator.py'));
 
 let client: IMasterClient = new MasterClient({
     allowRetry: true, 
     apiUrl: config.api.url, 
     maxConnectionAttemps: config.api.retryPolicy.maxConnectionAttempts
 });
+
+let cameraStreamer: ICameraController = new WebsocketCameraController();
+cameraStreamer.startStreaming("ws://192.168.1.44:3002/stream").then(() => console.log("starting to stream video")).catch(err => console.error("error in streaming", err));
 
 client.connect().then(() => {
     console.log('connected');

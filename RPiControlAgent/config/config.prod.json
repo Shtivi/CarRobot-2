@@ -10,7 +10,7 @@
         "serialPortName": "/dev/arduino"
     }, 
     "api": {
-        "url": "ws://192.168.1.39:3001/robot",
+        "url": "ws://192.168.1.44:3001/robot",
         "retryPolicy": {
             "maxConnectionAttempts": "10"
         }
