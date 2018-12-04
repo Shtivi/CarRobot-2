@@ -45,7 +45,7 @@ export class ProcessCameraControl extends events.EventEmitter implements ICamera
             this.raspividProcess.once('close', (code: number, signal: string) => {
                 resolve();
             })
-            this.raspividProcess.kill('SIGINT')
+            this.raspividProcess.kill('SIGINT');
         })
     }
 
