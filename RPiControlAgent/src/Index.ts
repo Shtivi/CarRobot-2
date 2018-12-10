@@ -17,9 +17,6 @@ import * as Log4js from 'log4js';
 import { ProcessCameraControl } from './camera/ProcessCameraControl';
 import { ICameraControl } from './camera/ICameraControl';
 
-// Log4js.configure(new Date().toTimeString());
-// let logger: Log4js.Logger = Log4js.getLogger();
-
 console.log("starting initialization");
 const environment: string = (process.env.NODE_ENV ? process.env.NODE_ENV.trim().toUpperCase() : 'DEV');
 console.log(`environment set to: ${environment}`);
