@@ -1,5 +1,3 @@
-// startStream('container', 'ws://'+window.location.hostname+':8081', true, 'auto', 2000)
-
 function startStream(playerElement, wsUri, token, useWorker, webgl, reconnectMs) {
 	if (!window.player) {
 		window.player = new Player({ useWorker: useWorker, webgl: webgl, size: { width: 848, height: 480 } })
@@ -24,6 +22,8 @@ function startStream(playerElement, wsUri, token, useWorker, webgl, reconnectMs)
 	}
 
 }
+
+window.startStream = startStream;
 
 // debugger stuff
 function avgFPS(length) {

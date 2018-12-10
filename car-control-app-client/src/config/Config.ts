@@ -9,7 +9,7 @@ export interface IConfig {
 }
 
 class Config implements IConfig {
-    private serverUrl: string = "http://192.168.1.44:3000";
+    private serverUrl: string = "http://localhost:3000";
 
     public api = {
         host: this.serverUrl,
@@ -17,6 +17,10 @@ class Config implements IConfig {
         routes: {
             sendCommand: "commands"
         }
+    }
+
+    public liveStream = {
+        streamerUrl: 'ws://localhost:3004/streaming'
     }
 }
 

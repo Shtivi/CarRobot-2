@@ -1,5 +1,6 @@
 <template>
     <div class="driver-cabin">
+        <live-stream-player v-bind:streamer-url='config.liveStream.streamerUrl'></live-stream-player>
         <navigation-control side='left' v-bind:commandsDispatcher="commandsDispatcher" v-bind:controlOptions="controls.driving"></navigation-control>
         <navigation-control side='right' v-bind:commandsDispatcher="commandsDispatcher" v-bind:controlOptions="controls.cameraTilt"></navigation-control>
     </div>
@@ -8,13 +9,14 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import NavigationControl from './NavigationControl.vue';
+import LiveStreamPlayer from './LiveStreamPlayer.vue';
 import { ControlViewOption } from '@/models/ControlViewOption';
 import { ControlOptions } from '@/models/ControlOptions';
 import { CommandsDispatcherApi } from '@/services/CommandsDispatcherApi';
 import config, { IConfig } from '@/config/Config';
 
 @Component({
-    components: {NavigationControl}
+    components: {NavigationControl, LiveStreamPlayer}
 })
 export default class DriverCabin extends Vue {
     get config(): IConfig {
@@ -86,8 +88,8 @@ export default class DriverCabin extends Vue {
 <style lang="scss">
 .driver-cabin {
     // background-image: url('../assets/IMG_0020b.jpg');
-    background-repeat: no-repeat;
-    background-size: cover;
+    // background-repeat: no-repeat;
+    // background-size: cover;
     width: 100%;
     height: 100vh;
     background-color: #fff;
