@@ -7,6 +7,11 @@ AF_DCMotor leftMotor(1);
 Servo cameraY;
 Servo cameraX;
 
+int US_TRIG_PIN = A0;
+int US_ECHO_PIN = A1;
+int MEASURE_DELAY = 250;
+long lastMeasureTime;
+
 String FORWARD_CMD = "DRIVE_FORWARD";
 String BACKWARD_CMD = "DRIVE_BACKWARD";
 String STOP_CMD = "STOP_DRIVING";
@@ -17,10 +22,11 @@ String TILT_DOWN_CMD = "TILT_DOWN";
 String TILT_LEFT_CMD = "TILT_LEFT";
 String TILT_RIGHT_CMD = "TILT_RIGHT";
 String STOP_TILTING = "STOP_TILTING";
-int ROTATION_SPEED = 5;
 
+int ROTATION_SPEED = 5;
 int xPos = 0;
 int yPos = 0;
+
 String currentCmd = "";
 
 void setup() {
@@ -37,12 +43,15 @@ void setup() {
   
   cameraX.write(96);
   cameraY.write(90);
-  
-  Serial.write("starting");
 
+  pinMode(US_TRIG_PIN, OUTPUT);
+  pinMode(US_ECHO_PIN, INPUT);
+  lastMeasureTime = 0;
 }
 
 void loop() {
+  int distanceMeasurement = 0;
+  
 //  cameraY.write(80);
 //  Serial.write((int)cameraY.read());
 //  delay(500);
@@ -56,7 +65,7 @@ void loop() {
 //  delay(1000);
   
   currentCmd = nextCommand();
-
+ 
   if (currentCmd.equals(FORWARD_CMD)) {
     rightMotor.run(FORWARD);  
     leftMotor.run(FORWARD);
@@ -86,6 +95,15 @@ void loop() {
     cameraX.write(96);
     cameraY.write(90);
   }
+
+  if (millis() - lastMeasureTime > MEASURE_DELAY) {
+    lastMeasureTime = millis();
+    distanceMeasurement = measureDistanceCm();
+    String measurements = "{ distance: ";
+    measurements += distanceMeasurement;
+    measurements += " }";
+    Serial.print(measurements);
+  }
 }
 
 String nextCommand() {
@@ -96,4 +114,20 @@ String nextCommand() {
   }
 
   return cmd;
+}
+
+int measureDistanceCm() {
+  long duration;
+  long distanceCm;
+  
+  digitalWrite(US_TRIG_PIN, LOW);
+  delayMicroseconds(5);
+  digitalWrite(US_TRIG_PIN, HIGH);
+  delayMicroseconds(5);
+  digitalWrite(US_TRIG_PIN, LOW);
+
+  duration = pulseIn(US_ECHO_PIN, HIGH);
+  distanceCm = (duration / 2) / 29.1;
+
+  return distanceCm;
 }
