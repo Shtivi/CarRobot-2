@@ -26,7 +26,11 @@ const robotWsServer = new WebSocket.Server({ port: config.robotWsServer.port, pa
 
 console.log("booting up live streaming tcp receiver");
 const liveStreamReceiver: ILiveStreamReceiver = new LiveStreamTcpReceiver(config.liveStreamingReceiver.port);
-liveStreamReceiver.start().then(() => {
+liveStreamReceiver.on('cameraConnection', () => {
+    console.log("camera connected");
+}).on('cameraDisconnection', () => {
+    console.log("camera disconnected");
+}).start().then(() => {
     console.log(`live streaming receiver is on :${config.liveStreamingReceiver.port}`);
 }).catch((err) => {
     console.error("failed to start live streaming receiver", err);

@@ -16,9 +16,9 @@ export class ProcessCameraControl extends events.EventEmitter implements ICamera
         return new Promise((resolve, reject) => {
             try {
                 this.raspividProcess = Process.spawn("raspivid", [
-                    ' -w ', options.width.toString(),
-                    ' -h ', options.height.toString(),
-                    ' -fps ', options.fps.toString(),
+                    ' -w ' + options.width.toString(),
+                    ' -h ' + options.height.toString(),
+                    ' -fps ' +  options.fps.toString(),
                     " -t 0 ",
                     "-ih ",
                     "-b 700000 ",

@@ -53,16 +53,16 @@ export class LiveStreamTcpReceiver extends events.EventEmitter implements ILiveS
                 return;
             }
 
-            if (count > 0) {
+            if (count > 1) {
                 socket.end();
-            }
-
+            } 
+            
             this.emit('cameraConnection');
             socket.on('end', function() {
                 this.emit('cameraDisconnection');
             });
 
-            const NALSplitter = Split(this.NALSeparator);
+            const NALSplitter = new Split(this.NALSeparator);
             NALSplitter.on('data', (data) => {
                 data = Buffer.concat([this.NALSeparator, data]);
                 if (this.headers.length < 3) {

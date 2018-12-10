@@ -14,13 +14,13 @@ import { RobotConnectionStatus } from './robotControl/RobotConnectionStatus';
 import * as path from 'path';
 import { SerialProxyCommunicator } from './robotControl/SerialProxyCommunicator';
 import * as Log4js from 'log4js';
-import { ICameraController } from './cameraControl/ICameraController';
-import { WebsocketCameraController } from './cameraControl/WebsocketCameraController';
+import { ProcessCameraControl } from './camera/ProcessCameraControl';
+import { ICameraControl } from './camera/ICameraControl';
 
-Log4js.configure(new Date().toTimeString());
-let logger: Log4js.Logger = Log4js.getLogger();
+// Log4js.configure(new Date().toTimeString());
+// let logger: Log4js.Logger = Log4js.getLogger();
 
-logger.info("starting initialization");
+console.log("starting initialization");
 const environment: string = (process.env.NODE_ENV ? process.env.NODE_ENV.trim().toUpperCase() : 'DEV');
 console.log(`environment set to: ${environment}`);
 
@@ -48,6 +48,21 @@ client.connect().then(() => {
             robotCommunicator.sendCommand(RobotCommand.of(data)).then(() => console.log(`command ${data} sent.`)).catch(console.error);
         }
     });
+    let cameraController: ICameraControl = new ProcessCameraControl(path.join(__dirname, '../external/stillCapture.py'));
+    
+    console.log("initailizing live streaming...");
+    cameraController.startStreaming({
+        fps: 25,
+        height: 600,
+        width: 800,
+        serverHost: "192.168.1.44",
+        serverPort: 3003
+    }).then(() => {
+        console.log("started to stream");
+    }), (err) => {
+        console.error("failed to stream", err)
+    };
+
     connectArduino(robotCommunicator);
 }).catch(() => console.error('failed to connect'));
 

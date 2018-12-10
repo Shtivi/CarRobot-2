@@ -85,7 +85,7 @@ export default class DriverCabin extends Vue {
 
 <style lang="scss">
 .driver-cabin {
-    background-image: url('../assets/IMG_0020b.jpg');
+    // background-image: url('../assets/IMG_0020b.jpg');
     background-repeat: no-repeat;
     background-size: cover;
     width: 100%;

@@ -6,12 +6,23 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,500,700,400italic|Material+Icons">
+
+    <script type="text/javascript" src="./visio/Decoder.js"></script>
+    <script type="text/javascript" src="./visio/client.js"></script>
+    <script type="text/javascript" src="./visio/YUVCanvas.js"></script>
+    <script type="text/javascript" src="./visio/Player.js"></script>
+    <script type="text/javascript">
+        setTimeout(() => {
+            startStream('liveStream', 'ws://192.168.1.44:3004/streaming');
+        }, 2000)
+    </script>
     <title>Car Control</title>
   </head>
   <body>
     <noscript>
       <strong>We're sorry but car-control-app-client doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
+    <div id="liveStream"></div>
     <div id="app"></div>
     <!-- built files will be auto injected -->
   </body>

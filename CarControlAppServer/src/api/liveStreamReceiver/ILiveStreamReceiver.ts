@@ -3,8 +3,8 @@ export interface ILiveStreamReceiver {
     stop(): Promise<void>;
     getHeaders(): any[];
     
-    on(eventName: 'cameraConnection', cb: () => void);
-    on(eventName: 'cameraDisconnection', cb: () => void);
-    on(eventName: 'error', cb: (Error) => void);
-    on(eventName: 'data', cb: (any) => void);
+    on(eventName: 'cameraConnection', cb: () => void): ILiveStreamReceiver;
+    on(eventName: 'cameraDisconnection', cb: () => void): ILiveStreamReceiver;
+    on(eventName: 'error', cb: (Error) => void): ILiveStreamReceiver;
+    on(eventName: 'data', cb: (any) => void): ILiveStreamReceiver;
 }
