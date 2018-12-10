@@ -51,13 +51,7 @@ client.connect().then(() => {
     let cameraController: ICameraControl = new ProcessCameraControl(path.join(__dirname, '../external/stillCapture.py'));
     
     console.log("initailizing live streaming...");
-    cameraController.startStreaming({
-        fps: 25,
-        height: 600,
-        width: 800,
-        serverHost: "192.168.1.44",
-        serverPort: 3003
-    }).then(() => {
+    cameraController.startStreaming(config.camera).then(() => {
         console.log("started to stream");
     }), (err) => {
         console.error("failed to stream", err)

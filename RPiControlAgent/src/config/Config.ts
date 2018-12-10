@@ -11,4 +11,12 @@ export class Config {
             maxConnectionAttempts: number
         }
     }
+
+    public camera: {
+        width: number,
+        height: number,
+        fps: number,
+        serverHost: string,
+        serverPort: number
+    }
 }

@@ -14,5 +14,12 @@
         "retryPolicy": {
             "maxConnectionAttempts": "10"
         }
+    },
+    "camera": {
+        "width": 800,
+        "height": 600,
+        "fps": 25,
+        "serverHost": "192.168.1.44",
+        "serverPort": 3003
     }
 }
