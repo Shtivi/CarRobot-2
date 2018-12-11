@@ -104,11 +104,11 @@ export default class NavigationControl extends Vue {
         position: absolute;
         width: $container-size + $glass-padding;
         height: $container-size + $glass-padding;
-        background-color: #fff;
+        background-color: #000;
         content: ' ';
         border-radius: 100%;
         filter: blur(0.5px);
-        opacity: 0.3;
+        opacity: 0.2;
         background-size: cover;
         top: -$glass-padding/2;
         left:-$glass-padding/2;
@@ -122,7 +122,7 @@ export default class NavigationControl extends Vue {
 
             .md-icon {
                 font-size:44px!important;
-                color: #222;
+                color: #fff;
             }
         }
     }

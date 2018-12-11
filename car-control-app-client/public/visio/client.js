@@ -1,25 +1,28 @@
-function startStream(playerElement, wsUri, token, useWorker, webgl, reconnectMs) {
+function startStream(playerElement, wsUri, token, useWorker, webgl, onConnected, onDisconnected) {
 	if (!window.player) {
 		window.player = new Player({ useWorker: useWorker, webgl: webgl, size: { width: 848, height: 480 } })
 		document.getElementById(playerElement).appendChild(window.player.canvas)
-		//window.debugger = new debug(playerElement) //show statistics, you can remove me if you dont need stats
-	}
-	var ws = new WebSocket(wsUri + "?token=" + token)
-	ws.binaryType = 'arraybuffer'
-	ws.onopen = function (e) {
-		console.log('websocket connected')
-		ws.onmessage = function (msg) {
-			window.player.decode(new Uint8Array(msg.data))
-			if(window.debugger) window.debugger.nal(msg.data.byteLength)
-		}
-	}
-	ws.onclose = function (e) {
-		console.log('websocket disconnected')
-		if (reconnectMs > 0) {
-			var el = playerElement, uri = wsUri
-			setTimeout(function() { startStream(el, uri, token) }, reconnectMs)
-		}
-	}
+    }
+    
+    var ws = new WebSocket(wsUri + "?token=" + token)
+    ws.binaryType = 'arraybuffer'
+    ws.onerror = function(error, data) {
+        
+    }
+
+    ws.onopen = function (event) {
+        onConnected();
+        ws.onmessage = function (msg) {
+            window.player.decode(new Uint8Array(msg.data))
+            if(window.debugger) window.debugger.nal(msg.data.byteLength)
+        }
+        ws.onerror = null;
+    }
+    ws.onclose = function (event) {
+        if (event.code == 1006) {
+            onConnected("Could not connect to remote server (1006: ERR_CONNECTION_REFUSED)")
+        }
+    }
 
 }
 
