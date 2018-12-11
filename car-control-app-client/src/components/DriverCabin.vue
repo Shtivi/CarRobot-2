@@ -88,6 +88,7 @@ export default class DriverCabin extends Vue {
 <style lang="scss">
 .driver-cabin {
     width: 100%;
+    height: 100vh;
     background-color: #fff;
     color: white;
 }

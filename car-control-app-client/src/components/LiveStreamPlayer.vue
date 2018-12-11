@@ -1,19 +1,26 @@
 <template>
     <div id="player-container">
-        <div v-show="liveStreamingStatus != 'CONNECTED'" class="not-connected">
-            <md-icon v-show="liveStreamingStatus != 'ERROR'">videocam_off</md-icon>
-            <md-icon v-show="liveStreamingStatus == 'ERROR'">error_outline</md-icon>
-            <div class="md-headline" v-if="liveStreamingStatus == 'DISCONNECTED'">
-                Live streaming is not active
-            </div>
-            <div class="md-headline" v-if="liveStreamingStatus == 'ERROR'">
-                {{errorMsg}}
-            </div>
-            <div class="md-headline error" v-if="liveStreamingStatus == 'CONNECTING'">
-                <md-progress-spinner md-mode="indeterminate" :md-stroke="4" :md-diameter="60"></md-progress-spinner>
-                <div>Connecting...</div>
-            </div>
+        <md-empty-state
+            v-show="liveStreamingStatus == 'DISCONNECTED' || liveStreamingStatus == 'CONNECTING'"
+            class="md-primary"
+            md-icon="videocam_off"
+            md-label="Live Streaming Disconnected">
+        </md-empty-state>
+        <div class="connecting" v-show="liveStreamingStatus == 'CONNECTING'">
+            <md-progress-spinner 
+                md-mode="indeterminate" 
+                :md-stroke="4" 
+                :md-diameter="80">
+            </md-progress-spinner>
         </div>
+
+        <md-empty-state 
+            v-show="liveStreamingStatus == 'ERROR'"
+            class="md-accent"
+            md-icon="error_outline"
+            md-label="Error"
+            v-bind:mdDescription="errorMsg">
+        </md-empty-state>
         <div v-show="liveStreamingStatus == 'CONNECTED'" id="live-stream-player"></div>
     </div>
 </template>
@@ -34,7 +41,7 @@ export default class LiveStreamPlayer extends Vue {
     @Prop() private streamerUrl!: string;
 
     private liveStreamingStatus: StreamingStatus = StreamingStatus.DISCONNECTED;
-    private errorMsg?: string;
+    private errorMsg?: string = "";
 
     get liveStreamingApi(): ILiveStreamingApi {
         return new LiveStreamingApi('live-stream-player', this.streamerUrl);
@@ -60,16 +67,9 @@ export default class LiveStreamPlayer extends Vue {
     height: 100%;
     color: #444;
 
-    .not-connected {
-        font-size: 32px;
-        padding: 20px;
+    .connecting {
+        margin: 0 auto;
         text-align: center;
-        
-        .md-icon {
-            height: auto;
-            width: auto;
-            font-size: 100px!important;
-        }
     }
 }
 </style>
