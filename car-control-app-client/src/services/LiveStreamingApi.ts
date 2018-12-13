@@ -2,7 +2,7 @@ import * as events from 'events';
 
 export interface ILiveStreamingApi {
     start(): Promise<void>;
-    //stop(): Promise<void>;
+    stop(): Promise<void>;
     on(event: 'disconnected', cb: () => void): ILiveStreamingApi;
     on(event: 'connected', cb: () => void): ILiveStreamingApi;
 }
@@ -12,11 +12,16 @@ export class LiveStreamingApi extends events.EventEmitter implements ILiveStream
         super();
     }
 
+    public stop(): Promise<void> {
+        return Promise.reject("not implemeted");
+    }
+
     public start(): Promise<void> {
         return new Promise((resolve, reject) => {
-            (<any>window).startStream(this.playerElementId, 
+            window.streaming.start(
+                this.playerElementId, 
                 this.streamerUrl, 
-                null, 
+                undefined, 
                 false, 
                 false, 
                 (err?: Error) => {
@@ -24,7 +29,7 @@ export class LiveStreamingApi extends events.EventEmitter implements ILiveStream
                         reject(err);
                         return;
                     }
-                    
+
                     this.emit('connected');
                     resolve();
                 },

@@ -1,3 +1,5 @@
+window.streaming = {}
+
 function startStream(playerElement, wsUri, token, useWorker, webgl, onConnected, onDisconnected) {
 	if (!window.player) {
 		window.player = new Player({ useWorker: useWorker, webgl: webgl, size: { width: 848, height: 480 } })
@@ -6,10 +8,10 @@ function startStream(playerElement, wsUri, token, useWorker, webgl, onConnected,
     
     var ws = new WebSocket(wsUri + "?token=" + token)
     ws.binaryType = 'arraybuffer'
-    ws.onerror = function(error, data) {
-        
+    
+    ws.onerror = function(error, data) {    
     }
-
+    
     ws.onopen = function (event) {
         onConnected();
         ws.onmessage = function (msg) {
@@ -18,15 +20,17 @@ function startStream(playerElement, wsUri, token, useWorker, webgl, onConnected,
         }
         ws.onerror = null;
     }
+    
     ws.onclose = function (event) {
         if (event.code == 1006) {
             onConnected("Could not connect to remote server (1006: ERR_CONNECTION_REFUSED)")
         }
     }
 
+    window.streaming.ws = ws;
 }
 
-window.startStream = startStream;
+window.streaming.start = startStream;
 
 // debugger stuff
 function avgFPS(length) {

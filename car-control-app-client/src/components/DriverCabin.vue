@@ -3,6 +3,7 @@
         <live-stream-player v-bind:streamer-url='config.liveStream.streamerUrl'></live-stream-player>
         <navigation-control side='left' v-bind:commandsDispatcher="commandsDispatcher" v-bind:controlOptions="controls.driving"></navigation-control>
         <navigation-control side='right' v-bind:commandsDispatcher="commandsDispatcher" v-bind:controlOptions="controls.cameraTilt"></navigation-control>
+        <video-controls></video-controls>
     </div>
 </template>
 
@@ -13,10 +14,11 @@ import LiveStreamPlayer from './LiveStreamPlayer.vue';
 import { ControlViewOption } from '@/models/ControlViewOption';
 import { ControlOptions } from '@/models/ControlOptions';
 import { CommandsDispatcherApi } from '@/services/CommandsDispatcherApi';
+import VideoControls from './VideoControls.vue';
 import config, { IConfig } from '@/config/Config';
 
 @Component({
-    components: {NavigationControl, LiveStreamPlayer}
+    components: {NavigationControl, LiveStreamPlayer, VideoControls}
 })
 export default class DriverCabin extends Vue {
     get config(): IConfig {
