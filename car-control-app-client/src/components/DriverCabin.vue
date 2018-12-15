@@ -1,6 +1,6 @@
 <template>
     <div class="driver-cabin">
-        <live-stream-player v-bind:streamer-url='config.liveStream.streamerUrl'></live-stream-player>
+        <live-stream-player></live-stream-player>
         <navigation-control side='left' v-bind:commandsDispatcher="commandsDispatcher" v-bind:controlOptions="controls.driving"></navigation-control>
         <navigation-control side='right' v-bind:commandsDispatcher="commandsDispatcher" v-bind:controlOptions="controls.cameraTilt"></navigation-control>
         <video-controls></video-controls>

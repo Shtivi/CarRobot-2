@@ -1,0 +1,6 @@
+export enum StreamingStatus {
+    DISCONNECTED = 'DISCONNECTED',
+    ERROR = 'ERROR',
+    CONNECTING = 'CONNECTING',
+    CONNECTED = 'CONNECTED'
+}

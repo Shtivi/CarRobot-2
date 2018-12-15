@@ -1,31 +1,65 @@
 <template>
     <div class="video-controls">
         <div class="controls-container">
-            <md-button class="md-icon-button">
-                <md-icon>stop</md-icon>
-            </md-button>
-            <md-button class="md-icon-button md-raised">
-            </md-button>
-            <md-button class="md-icon-button" v-on:click="toggleVideoPlaying()">
-                <!-- <md-icon v-show="!isPaused">pause_circle_outline</md-icon>
-                <md-icon v-show="isPaused">play_circle_outline</md-icon> -->
-                <md-icon v-show="!isPaused">pause</md-icon>
-                <md-icon v-show="isPaused">play_arrow</md-icon>
-            </md-button>
+            <div v-show="streamingStatus != 'CONNECTED'" class="async-btn-container">
+                <md-button v-on:click="startStreaming()" class="md-icon-button md-raised md-primary">
+                    <md-icon>videocam</md-icon>
+                </md-button>
+                <div class="spinner">
+                    <md-progress-spinner
+                        class="md-accent" 
+                        md-mode="indeterminate" 
+                        :md-stroke="2" 
+                        :md-diameter="40"
+                        v-if="streamingStatus == 'CONNECTING'"></md-progress-spinner>
+                </div>
+            </div>
+            <div v-show="streamingStatus == 'CONNECTED'">
+                <md-button v-on:click="disconnectLiveStreaming()" class="md-icon-button">
+                    <md-icon>stop</md-icon>
+                </md-button>
+                <md-button class="md-icon-button md-raised">
+                </md-button>
+                <md-button class="md-icon-button">
+                    <!-- <md-icon v-show="isStreaming">pause</md-icon> -->
+                    <md-icon v-show="true">pause</md-icon>
+                    <!-- <md-icon v-show="!isStreaming">play_arrow</md-icon> -->
+                </md-button>
+            </div>
         </div>        
     </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import Vue from 'vue';
+import { State, Action, Getter, Mutation } from 'vuex-class';
+import Component from 'vue-class-component';
+import { ILiveStreamingState } from '@/store/modules/liveStreaming/ILiveStreamingState';
+import { IStartLiveStreamingPayload } from '@/store/modules/liveStreaming/IStartLiveStreamingPayload';
+import { StreamingStatus } from '@/models/StreamingStatus';
 
-@Component({
-})
+@Component
 export default class VideoControls extends Vue {
-    private isPaused: boolean = true;
+    @Getter('streamingStatus') 
+    private streamingStatus!: StreamingStatus; 
+    
+    @Action('startLiveStreaming')
+    private startLiveStreaming!: (args: IStartLiveStreamingPayload) => Promise<void>;
 
-    private toggleVideoPlaying(): void {
-        this.isPaused = !this.isPaused;
+    @Action('stopLiveStreaming')
+    private stopLiveStreaming!: () => Promise<void>;
+
+    private startStreaming(): void {
+        this.startLiveStreaming({
+            playerElementId: "live-stream-player"
+        });
+    }
+    
+    private disconnectLiveStreaming(): void {
+        this.stopLiveStreaming().catch((err) => {
+            alert("error");
+            console.error(err)
+        })
     }
 }
 </script>
@@ -47,6 +81,18 @@ export default class VideoControls extends Vue {
 
     .md-icon {
         color:white!important;
+    }
+
+    .async-btn-container {
+        position: relative;
+
+        .spinner {
+            position: absolute;
+            z-index: 888;
+            top: 0px;
+            left: 50%;
+            transform: translate(-50%);
+        }
     }
 
     .controls-container::before {
