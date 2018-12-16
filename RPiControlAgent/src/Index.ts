@@ -40,7 +40,12 @@ let client: IMasterClient = new MasterClient({
 client.connect().then(() => {
     console.log('connected');
     client.on('data', (data: string) => {
-        if (robotCommunicator.getConnectionStatus() == RobotConnectionStatus.CONNECTED) {
+        if (data == 'CAPTURE') {
+            // todo - have a channel for errors
+            cameraController.capture().then((data: string) => {
+                client.send('capture', data).then(() => console.log("captured and sent")).catch(err => console.error(err));
+            }).catch(err => console.error(err))
+        } else if (robotCommunicator.getConnectionStatus() == RobotConnectionStatus.CONNECTED) {
             console.log(`Received command: ${data}. Sendind to robot...`);  
             robotCommunicator.sendCommand(RobotCommand.of(data)).then(() => console.log(`command ${data} sent.`)).catch(console.error);
         }
@@ -50,9 +55,6 @@ client.connect().then(() => {
     console.log("initailizing live streaming...");
     cameraController.startStreaming(config.camera).then(() => {
         console.log("started to stream");
-        cameraController.capture().then((data: string) => {
-            require('fs').writeFileSync('d:/idoido.jpeg',data,{encoding:'base64'});
-        }).catch(err => console.error('failed to capture', err));
     }), (err) => {
         console.error("failed to stream", err)
     };
