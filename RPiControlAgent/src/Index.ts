@@ -14,8 +14,8 @@ import { RobotConnectionStatus } from './robotControl/RobotConnectionStatus';
 import * as path from 'path';
 import { SerialProxyCommunicator } from './robotControl/SerialProxyCommunicator';
 import * as Log4js from 'log4js';
-import { ProcessCameraControl } from './camera/ProcessCameraControl';
 import { ICameraControl } from './camera/ICameraControl';
+import { PythonScriptCameraControl } from './camera/PythonScriptCameraControl';
 
 console.log("starting initialization");
 const environment: string = (process.env.NODE_ENV ? process.env.NODE_ENV.trim().toUpperCase() : 'DEV');
@@ -40,12 +40,17 @@ let client: IMasterClient = new MasterClient({
 client.connect().then(() => {
     console.log('connected');
     client.on('data', (data: string) => {
-        if (robotCommunicator.getConnectionStatus() == RobotConnectionStatus.CONNECTED) {
+        if (data == 'CAPTURE') {
+            // todo - have a channel for errors
+            cameraController.capture().then((data: string) => {
+                client.send('capture', data).then(() => console.log("captured and sent")).catch(err => console.error(err));
+            }).catch(err => console.error(err))
+        } else if (robotCommunicator.getConnectionStatus() == RobotConnectionStatus.CONNECTED) {
             console.log(`Received command: ${data}. Sendind to robot...`);  
             robotCommunicator.sendCommand(RobotCommand.of(data)).then(() => console.log(`command ${data} sent.`)).catch(console.error);
         }
     });
-    let cameraController: ICameraControl = new ProcessCameraControl(path.join(__dirname, '../external/stillCapture.py'));
+    let cameraController: ICameraControl = new PythonScriptCameraControl(path.join(__dirname, '../external/camera.py'));
     
     console.log("initailizing live streaming...");
     cameraController.startStreaming(config.camera).then(() => {

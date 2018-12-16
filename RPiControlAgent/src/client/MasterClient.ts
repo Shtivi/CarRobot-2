@@ -50,6 +50,22 @@ export class MasterClient extends events.EventEmitter implements IMasterClient {
         this._websocketClient.close(1000);
     }
 
+    public send(eventType: string, data: any): Promise<void> {
+        if (this._connectionStatus != ConnectionStatus.CONNECTED) {
+            return Promise.reject('could not send message: there was no connection');
+        }
+
+        return new Promise((resolve, reject) => {
+            this._websocketClient.send(JSON.stringify({ eventType, data }), (err?: Error) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve();
+            })
+        })
+    }
+
     private connectionActionCreator(success, fail): void {
         let self = this;
         this._connectionStatus = ConnectionStatus.CONNECTING;
