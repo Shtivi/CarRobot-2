@@ -14,8 +14,8 @@ import { RobotConnectionStatus } from './robotControl/RobotConnectionStatus';
 import * as path from 'path';
 import { SerialProxyCommunicator } from './robotControl/SerialProxyCommunicator';
 import * as Log4js from 'log4js';
-import { ProcessCameraControl } from './camera/ProcessCameraControl';
 import { ICameraControl } from './camera/ICameraControl';
+import { PythonScriptCameraControl } from './camera/PythonScriptCameraControl';
 
 console.log("starting initialization");
 const environment: string = (process.env.NODE_ENV ? process.env.NODE_ENV.trim().toUpperCase() : 'DEV');
@@ -45,11 +45,14 @@ client.connect().then(() => {
             robotCommunicator.sendCommand(RobotCommand.of(data)).then(() => console.log(`command ${data} sent.`)).catch(console.error);
         }
     });
-    let cameraController: ICameraControl = new ProcessCameraControl(path.join(__dirname, '../external/stillCapture.py'));
+    let cameraController: ICameraControl = new PythonScriptCameraControl(path.join(__dirname, '../external/camera.py'));
     
     console.log("initailizing live streaming...");
     cameraController.startStreaming(config.camera).then(() => {
         console.log("started to stream");
+        cameraController.capture().then((data: string) => {
+            require('fs').writeFileSync('d:/idoido.jpeg',data,{encoding:'base64'});
+        }).catch(err => console.error('failed to capture', err));
     }), (err) => {
         console.error("failed to stream", err)
     };
