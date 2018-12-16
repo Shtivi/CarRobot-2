@@ -2,7 +2,7 @@
     <div class="video-controls">
         <div class="controls-container">
             <div v-show="streamingStatus != 'CONNECTED'" class="async-btn-container">
-                <md-button v-on:click="startStreaming()" class="md-icon-button md-raised md-primary">
+                <md-button v-on:click="dispatchStartLiveStreaming()" class="md-icon-button md-raised md-primary">
                     <md-icon>videocam</md-icon>
                 </md-button>
                 <div class="spinner">
@@ -15,7 +15,7 @@
                 </div>
             </div>
             <div v-show="streamingStatus == 'CONNECTED'">
-                <md-button v-on:click="disconnectLiveStreaming()" class="md-icon-button">
+                <md-button v-on:click="dispatchStopLiveStreaming()" class="md-icon-button">
                     <md-icon>stop</md-icon>
                 </md-button>
                 <md-button class="md-icon-button md-raised">
@@ -49,17 +49,21 @@ export default class VideoControls extends Vue {
     @Action('stopLiveStreaming')
     private stopLiveStreaming!: () => Promise<void>;
 
-    private startStreaming(): void {
+    private dispatchStartLiveStreaming(): void {
         this.startLiveStreaming({
             playerElementId: "live-stream-player"
         });
     }
     
-    private disconnectLiveStreaming(): void {
+    private dispatchStopLiveStreaming(): void {
         this.stopLiveStreaming().catch((err) => {
             alert("error");
             console.error(err)
         })
+    }
+
+    private mounted(): void {
+        this.dispatchStartLiveStreaming();
     }
 }
 </script>
