@@ -21,6 +21,12 @@ const robotWsServer = new WebSocket.Server({ port: config.robotWsServer.port, pa
     console.log(`robot web socket server is listenning at: ws://localhost:${config.robotWsServer.port}${config.robotWsServer.path}`);
     robotWsServer.on('connection', (connection: WebSocket, request: IncomingMessage) => {
         console.log("robot connection");
+        connection.on('message', (data: WebSocket.Data) => {
+            const json = JSON.parse(data.toString());
+            if (json.eventType == 'capture') {
+                require('fs').writeFileSync('d:/ido.jpeg', json.data, {encoding:'base64'});
+            }
+        })
     });
 })
 
@@ -53,27 +59,6 @@ const liveStreamingServer = new WebSocket.Server({ port: 3004, path: '/streaming
         });
     });
 });
-
-// const streamWsServer = new WebSocket.Server({
-//     port: 3002,
-//     path: '/stream'
-// }, () => {
-//     console.log('streaming websocket server is listenning at: ws://localhost:3002/stream');
-//     streamWsServer.on('connection', (connection: WebSocket, request: IncomingMessage) => {
-//         if (request.headers['iscamera']) {
-//             console.log('camera streamer connected');
-//             connection.on('message', (data: WebSocket.Data) => {
-//                 streamWsServer.clients.forEach((client: WebSocket) => {
-//                     if (client != connection) {
-//                         client.send(data, {binary: true})
-//                     }
-//                 })
-//             })
-//         } else {
-//             console.log("streaming client connected");
-//         }
-//     })
-// })
 
 console.log("booting up http server");
 const app: express.Application = express();
