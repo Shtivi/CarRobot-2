@@ -23,11 +23,16 @@ export class PythonScriptCameraControl extends events.EventEmitter implements IC
             this.process.stdout.once('data', (buffer: Uint8Array) => {
                 const data: string = buffer.toString();
                 if (data == 'STARTED') {
+                    this.isActive = true;
                     resolve();
                 } else {
                     reject(data);
                 }
             });
+            
+            this.process.once('close', (code: number, signal: string) => {
+                this.isActive = false;
+            })
         })
     }
 
