@@ -30,12 +30,14 @@ try:
         # let the camera warm up for 2 seconds
         time.sleep(2)
         thread.start_new_thread(capture, (camera, ))
-        print("STARTED")
+        sys.stdout.write("STARTED")
+        sys.stdout.flush()
         camera.start_recording(connection, format='h264', profile='baseline', inline_headers=True, bitrate=700000)
         camera.wait_recording(60 * 60 * 24)
         camera.stop_recording()
 except Exception as err:
-    print(str(err))
+    sys.stdout.write(str(err))
+    sys.stdout.flush()
 finally:
     connection.close()
     client_socket.close()
