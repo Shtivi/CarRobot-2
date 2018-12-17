@@ -24,7 +24,7 @@ const robotWsServer = new WebSocket.Server({ port: config.robotWsServer.port, pa
         connection.on('message', (data: WebSocket.Data) => {
             const json = JSON.parse(data.toString());
             if (json.eventType == 'capture') {
-                require('fs').writeFileSync('d:/ido.jpeg', json.data, {encoding:'base64'});
+                require('fs').writeFileSync('d:/ido.jpeg', json.data, {encoding: 'base64'});
             }
         })
     });

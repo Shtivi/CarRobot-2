@@ -50,7 +50,7 @@ client.connect().then(() => {
             robotCommunicator.sendCommand(RobotCommand.of(data)).then(() => console.log(`command ${data} sent.`)).catch(console.error);
         }
     });
-    let cameraController: ICameraControl = new PythonScriptCameraControl(path.join(__dirname, '../external/camera.py'));
+    let cameraController: ICameraControl = new PythonScriptCameraControl(path.join(__dirname, '../external/camera.py'), path.join(__dirname, '../capture_output.jpeg'));
     
     console.log("initailizing live streaming...");
     cameraController.startStreaming(config.camera).then(() => {

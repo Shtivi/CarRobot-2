@@ -1,5 +1,6 @@
 import * as events from 'events';
 import * as Process from "child_process";
+import * as fs from 'fs';
 import { ICameraControl } from './ICameraControl';
 import { CameraOptions } from './CameraOptions';
 
@@ -7,7 +8,7 @@ export class PythonScriptCameraControl extends events.EventEmitter implements IC
     private isActive: boolean;
     private process: Process.ChildProcess;
 
-    public constructor(private pythonScriptPath: string) {
+    public constructor(private pythonScriptPath: string, private captureFilePath) {
         super();
 
         this.isActive = false;
@@ -19,7 +20,7 @@ export class PythonScriptCameraControl extends events.EventEmitter implements IC
         }
 
         return new Promise<void>((resolve, reject) => {
-            this.process = Process.spawn("python", [this.pythonScriptPath, options.serverHost, options.serverPort.toString(), options.width.toString(), options.height.toString()]);
+            this.process = Process.spawn("python", [this.pythonScriptPath, options.serverHost, options.serverPort.toString(), options.width.toString(), options.height.toString(), this.captureFilePath]);
             this.process.stdout.once('data', (buffer: Uint8Array) => {
                 const data: string = buffer.toString();
                 if (data == 'STARTED') {
@@ -57,9 +58,22 @@ export class PythonScriptCameraControl extends events.EventEmitter implements IC
                 return;
             }
 
-            this.process.stdout.once('data', (buffer: Buffer) => {
-                const dataBase64: string = buffer.toString('base64');
-                resolve(dataBase64);
+            this.process.stdout.once('data', (buffer: Uint8Array) => {
+                const data: string = buffer.toString().trim();
+                if (data == 'CAPTURED') {
+                    fs.readFile(this.captureFilePath, {}, (err: NodeJS.ErrnoException, data: Buffer) => {
+                        if (err) {
+                            reject({error: err});
+                            return;
+                        }
+
+                        resolve(data.toString('base64'));
+                    });
+                } else {
+                    reject(data);
+                }
+
+                return;
             });
 
             this.process.stdin.write('CAPTURE\n\r', (err: Error) => {
