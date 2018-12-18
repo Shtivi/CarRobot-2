@@ -6,4 +6,5 @@ export interface ILiveStreamingState {
     streamingStatus: StreamingStatus;
     liveStreamingApi: Optional<ILiveStreamingApi>;
     errorMessage: string;
+    isCapturing: boolean;
 }

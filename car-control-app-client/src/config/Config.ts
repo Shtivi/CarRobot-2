@@ -20,7 +20,7 @@ class Config implements IConfig {
     }
 
     public liveStream = {
-        streamerUrl: 'ws://192.168.1.41:3004/streaming'
+        streamerUrl: 'ws://192.168.1.41:3000/api/streaming'
     }
 }
 

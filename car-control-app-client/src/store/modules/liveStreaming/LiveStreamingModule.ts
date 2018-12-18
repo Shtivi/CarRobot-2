@@ -7,11 +7,13 @@ import { IStartLiveStreamingPayload } from './IStartLiveStreamingPayload';
 import { StreamingStatus } from '@/models/StreamingStatus';
 import Config from '@/config/Config';
 import { Notifications } from '@/services/Notifications';
+import { CommandsDispatcherApi } from '@/services/CommandsDispatcherApi';
 
 export const state: ILiveStreamingState = {
     streamingStatus: StreamingStatus.DISCONNECTED,
     errorMessage: "",
-    liveStreamingApi: Optional.of()
+    liveStreamingApi: Optional.of(),
+    isCapturing: false
 }
 
 export const liveStreamingModule: Module<ILiveStreamingState, IRootState> = {
@@ -23,6 +25,9 @@ export const liveStreamingModule: Module<ILiveStreamingState, IRootState> = {
         },
         errorMessage(state: ILiveStreamingState): string {
             return state.errorMessage;
+        },
+        isCapturing(state: ILiveStreamingState): boolean {
+            return state.isCapturing
         }
     },
     mutations: {
@@ -31,6 +36,9 @@ export const liveStreamingModule: Module<ILiveStreamingState, IRootState> = {
         },
         setLiveStreamingApiInstance(state: ILiveStreamingState, payload: ILiveStreamingApi): void {
             state.liveStreamingApi = Optional.of(payload);
+        },
+        setIsCapturing(state: ILiveStreamingState, payload: boolean): void {
+            state.isCapturing = payload;
         }
     },
     actions: {
@@ -59,6 +67,18 @@ export const liveStreamingModule: Module<ILiveStreamingState, IRootState> = {
             }
 
             return state.liveStreamingApi.get().stop();
+        },
+
+        capture({ commit, state }): Promise<string[]> {
+            if (state.isCapturing) {
+                return Promise.reject("Already capturing");
+            }
+
+            commit('setIsCapturing', true);
+            // Not good!!! use as singleton
+            return new CommandsDispatcherApi(Config).sendCommand('CAPTURE').finally(() => {
+                commit('setIsCapturing', false);
+            });
         }
     }
 }

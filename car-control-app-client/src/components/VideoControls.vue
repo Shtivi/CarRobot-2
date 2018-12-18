@@ -14,12 +14,22 @@
                         v-if="streamingStatus == 'CONNECTING'"></md-progress-spinner>
                 </div>
             </div>
-            <div v-show="streamingStatus == 'CONNECTED'">
+            <div v-show="streamingStatus == 'CONNECTED'" class="async-btn-container">
                 <md-button v-on:click="dispatchStopLiveStreaming()" class="md-icon-button">
                     <md-icon>stop</md-icon>
                 </md-button>
-                <md-button class="md-icon-button md-raised">
+                
+                <md-button v-on:click="dispatchCapture()" class="md-icon-button md-raised">
                 </md-button>
+                <div class="spinner">
+                    <md-progress-spinner
+                        class="md-primary" 
+                        md-mode="indeterminate" 
+                        :md-stroke="2" 
+                        :md-diameter="40"
+                        v-if="isCapturing"></md-progress-spinner>
+                </div>
+                
                 <md-button class="md-icon-button">
                     <!-- <md-icon v-show="isStreaming">pause</md-icon> -->
                     <md-icon v-show="true">pause</md-icon>
@@ -43,12 +53,18 @@ import { IToastOptions } from '@/models/IToastOptions';
 export default class VideoControls extends Vue {
     @Getter('streamingStatus') 
     private streamingStatus!: StreamingStatus; 
+
+    @Getter('isCapturing') 
+    private isCapturing!: boolean; 
     
     @Action('startLiveStreaming')
     private startLiveStreaming!: (args: IStartLiveStreamingPayload) => Promise<void>;
 
     @Action('stopLiveStreaming')
     private stopLiveStreaming!: () => Promise<void>;
+
+    @Action('capture')
+    private capture!: () => Promise<string[]>;
 
     @Action('notification')
     private showNotification!: (options: IToastOptions) => void;
@@ -62,6 +78,16 @@ export default class VideoControls extends Vue {
     private dispatchStopLiveStreaming(): void {
         this.stopLiveStreaming().catch((err) => {
             this.showNotification({ label: err })
+        })
+    }
+
+    private dispatchCapture(): void {
+        this.capture().then((warnings: string[]) => {
+            if (warnings.length > 0) {
+                this.showNotification({label: `Warning: ${warnings.join(", ")}`, duration: 3000})
+            }
+        }).catch(err => {
+            this.showNotification({label: err, duration: 1000});
         })
     }
 
@@ -100,6 +126,10 @@ export default class VideoControls extends Vue {
             left: 50%;
             transform: translate(-50%);
         }
+    }
+
+    .md-icon-button {
+        margin: 0;
     }
 
     .controls-container::before {
