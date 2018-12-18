@@ -8,17 +8,18 @@ import 'vue-material/dist/theme/default.css';
 import MdButton from 'vue-material';
 import MdIcon from 'vue-material';
 import MdProgressSpinner from 'vue-material';
-import MdCheckbox from 'vue-material';
+import MdSnackbar from 'vue-material';
 
 Vue.use(MdButton);
 Vue.use(MdIcon);
 Vue.use(MdProgressSpinner);
-Vue.use(MdCheckbox);
+Vue.use(MdSnackbar);
 
 /* Vuex */
 import Vuex, { StoreOptions } from 'vuex';
 import { IRootState } from './store/IRootState';
 import { liveStreamingModule } from './store/modules/liveStreaming/LiveStreamingModule';
+import { notificationsModule } from './store/modules/notifications/NotificationsModule';
 
 Vue.use(Vuex);
 
@@ -27,7 +28,8 @@ const store: StoreOptions<IRootState> = {
         version: "1.0.0"
     },
     modules: {
-        liveStreaming: liveStreamingModule
+        liveStreaming: liveStreamingModule,
+        notifications: notificationsModule
     }
 }
 

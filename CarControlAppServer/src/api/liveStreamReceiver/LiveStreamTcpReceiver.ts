@@ -58,7 +58,7 @@ export class LiveStreamTcpReceiver extends events.EventEmitter implements ILiveS
             } 
             
             this.emit('cameraConnection');
-            socket.on('close', function() {
+            socket.on('end', () => {
                 this.emit('cameraDisconnection');
             });
 

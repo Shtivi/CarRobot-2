@@ -108,7 +108,7 @@ export default class NavigationControl extends Vue {
         content: ' ';
         border-radius: 100%;
         filter: blur(0.5px);
-        opacity: 0.2;
+        opacity: 0.3;
         background-size: cover;
         top: -$glass-padding/2;
         left:-$glass-padding/2;

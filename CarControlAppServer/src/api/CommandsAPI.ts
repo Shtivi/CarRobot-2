@@ -2,34 +2,27 @@ import { Request, Response } from "express";
 import * as WebSocket from 'ws';
 import { BaseApiRouter } from "./BaseApiRouter";
 import { RouteAction, HttpMethod } from "./RouteAction";
+import { IRobotWebsocketServer } from "./robotWebsocketServer/IRobotWebsocketServer";
 
 export class CommandsAPI extends BaseApiRouter {
 
-    public constructor(private wss: WebSocket.Server) {
+    public constructor(private robotWss: IRobotWebsocketServer) {
         super();
     }
 
     private handleCommand(req: Request, res: Response): void {
-        console.log(`received command: ${req.params.cmd}`);
-        
-        if (!this.wss) {
+        if (!this.robotWss) {
             res.status(500).send("No web socket server defined");
             return;
         }
 
-        if (this.wss.clients.size == 0)  {
-            res.status(200).send({
-                warning: "command sent, but there are no listeners registered to receive it."
-            });
-            return;
-        }
-
-        this.wss.clients.forEach((client: WebSocket) => {
-            client.send(req.params.cmd);
-        })
-        
         console.log(`sending command: ${req.params.cmd}`);
-        res.status(200).send();
+        this.robotWss.send(req.params.cmd).then((warnings: string[]) => {
+            res.status(200).send(warnings);
+            console.log(`${req.params.cmd} sent with ${warnings.length} warnings: ${warnings.join(", ")}`);
+        }).catch((err: Error) => {
+            res.status(500).send(err);
+        });        
     }
 
     protected buildRoutes(): RouteAction[] {

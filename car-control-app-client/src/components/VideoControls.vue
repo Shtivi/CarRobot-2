@@ -37,6 +37,7 @@ import Component from 'vue-class-component';
 import { ILiveStreamingState } from '@/store/modules/liveStreaming/ILiveStreamingState';
 import { IStartLiveStreamingPayload } from '@/store/modules/liveStreaming/IStartLiveStreamingPayload';
 import { StreamingStatus } from '@/models/StreamingStatus';
+import { IToastOptions } from '@/models/IToastOptions';
 
 @Component
 export default class VideoControls extends Vue {
@@ -49,6 +50,9 @@ export default class VideoControls extends Vue {
     @Action('stopLiveStreaming')
     private stopLiveStreaming!: () => Promise<void>;
 
+    @Action('notification')
+    private showNotification!: (options: IToastOptions) => void;
+
     private dispatchStartLiveStreaming(): void {
         this.startLiveStreaming({
             playerElementId: "live-stream-player"
@@ -57,8 +61,7 @@ export default class VideoControls extends Vue {
     
     private dispatchStopLiveStreaming(): void {
         this.stopLiveStreaming().catch((err) => {
-            alert("error");
-            console.error(err)
+            this.showNotification({ label: err })
         })
     }
 
@@ -108,7 +111,7 @@ export default class VideoControls extends Vue {
         background-color: #000;
         content: ' ';
         filter: blur(0.5px);
-        opacity: 0.2;
+        opacity: 0.3;
         background-size: cover;
         top: -$glass-padding/2;
         left: -$glass-padding/2;
