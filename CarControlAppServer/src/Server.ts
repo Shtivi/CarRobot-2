@@ -1,4 +1,5 @@
 import express, { Router } from 'express';
+import * as http from 'http'
 import { Config } from './config/Config';
 import ConfigLoader from './config/ConfigLoader';
 import * as WebSocket from 'ws';
@@ -20,32 +21,34 @@ function main() {
     console.log("loading configuration");
     const config: Config = ConfigLoader.loadConfig(environment);
     
-    console.log("booting up robot web socket server");
-    // const robotWsServer = new WebSocket.Server({ port: config.robotWsServer.port, path: config.robotWsServer.path}, () => {
-    //     console.log(`robot web socket server is listenning at: ws://localhost:${config.robotWsServer.port}${config.robotWsServer.path}`);
-    //     robotWsServer.on('connection', (connection: WebSocket, request: IncomingMessage) => {
-    //         console.log("robot connection");
-    //         connection.on('message', (data: WebSocket.Data) => {
-    //             const json = JSON.parse(data.toString());
-    //             if (json.eventType == 'capture') {
-    //                 require('fs').writeFileSync('d:/ido.jpeg', json.data, {encoding: 'base64'});
-    //             }
-    //         })
-    //     });
-    // })
-    
-    const capturesManager: ICapturesManager = new CapturesManager("");
-    const robotWsServer: IRobotWebsocketServer = new RobotWebsocketServer(
-            config.robotWsServer.path, 
-            config.robotWsServer.port, 
-            () => console.log(`robot web socket server is listenning at: ws://localhost:${config.robotWsServer.port}${config.robotWsServer.path}`));
-    robotWsServer
-        .on('connection', () => console.log('robot connected'))
+    const app: express.Application = express();
+    const httpServer: http.Server = http.createServer(app)
+
+    console.log("booting up robot web socket server");    
+    const robotWsServer: IRobotWebsocketServer = new RobotWebsocketServer(config.robotWsServer.path, httpServer, () => {
+        console.log(`robot web socket server is listenning at: ws://localhost:${config.httpServer.port}${config.robotWsServer.path}`);
+    }).on('connection', () => console.log('robot connected'))
         .on('disconnection', () => console.log('robot disconnected'))
         .on('capture', (base64Data: string) => {
             console.log("captured");
         })
     
+    const capturesManager: ICapturesManager = new CapturesManager("");
+
+    console.log("booting up http server");
+    const generalRouter: IRouter = Router().use((req, res, next) => {
+            res.header("Access-Control-Allow-Origin", "*");
+            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+            res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+            next();
+        })
+        .use('/commands', new CommandsAPI(robotWsServer).router())
+        .use('/captures', new CapturesAPI(capturesManager).router());
+    app.use('/api', generalRouter);
+    httpServer.listen(config.httpServer.port, () => {
+        console.log(`http server listenning at: http://localhost:${config.httpServer.port}`);
+    });
+
     console.log("booting up live streaming tcp receiver");
     const liveStreamReceiver: ILiveStreamReceiver = new LiveStreamTcpReceiver(config.liveStreamingReceiver.port);
     liveStreamReceiver.on('cameraConnection', () => {
@@ -75,24 +78,6 @@ function main() {
             });
         });
     });
-    
-    console.log("booting up http server");
-    const app: express.Application = express();
-    const generalRouter: IRouter = Router()
-        .use((req, res, next) => {
-            res.header("Access-Control-Allow-Origin", "*");
-            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-            res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-            next();
-        })
-        .use('/commands', new CommandsAPI(robotWsServer).router())
-        .use('/captures', new CapturesAPI(capturesManager).router());
-    
-    app
-        .use('/api', generalRouter)
-        .listen(config.httpServer.port, () => {
-            console.log(`http server listenning at: http://localhost:${config.httpServer.port}`);
-        })
 }
 
 main();

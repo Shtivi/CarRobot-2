@@ -56,7 +56,13 @@ export class MasterClient extends events.EventEmitter implements IMasterClient {
         }
 
         return new Promise((resolve, reject) => {
-            this._websocketClient.send(JSON.stringify({ eventType, data }), (err?: Error) => {
+            const message = { eventType, data, hasError: false };
+
+            if (eventType == 'error') {
+                message.hasError = true;
+            }
+
+            this._websocketClient.send(JSON.stringify(message), (err?: Error) => {
                 if (err) {
                     reject(err);
                     return;

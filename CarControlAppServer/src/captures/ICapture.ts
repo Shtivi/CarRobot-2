@@ -1,6 +1,6 @@
 export interface ICapture {
     details: {
-        timeTaken: number;
+        time: number;
         fileName: string;
         extension: string;
         name: string;

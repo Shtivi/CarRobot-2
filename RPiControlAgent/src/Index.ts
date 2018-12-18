@@ -41,21 +41,22 @@ client.connect().then(() => {
     console.log('connected');
     client.on('data', (data: string) => {
         if (data == 'CAPTURE') {
-            // todo - have a channel for errors
             cameraController.capture().then((data: string) => {
-                client.send('capture', data).then(() => console.log("captured and sent")).catch(err => console.error(err));
-            }).catch(err => console.error(err))
+                client.send('capture', data).then(() => console.log("captured and sent")).catch(err => console.error("captured but failed sending", err));
+            }).catch(err => client.send('error', err))
         } else if (robotCommunicator.getConnectionStatus() == RobotConnectionStatus.CONNECTED) {
             console.log(`Received command: ${data}. Sendind to robot...`);  
             robotCommunicator.sendCommand(RobotCommand.of(data)).then(() => console.log(`command ${data} sent.`)).catch(console.error);
         }
     });
-    let cameraController: ICameraControl = new PythonScriptCameraControl(path.join(__dirname, '../external/camera.py'), path.join(__dirname, '../capture_output.jpeg'));
-    
+
     console.log("initailizing live streaming...");
+    const cameraController: ICameraControl = 
+        new PythonScriptCameraControl(path.join(__dirname, '../external/camera.py'), path.join(__dirname, '../capture_output.jpeg'));  
+
     cameraController.startStreaming(config.camera).then(() => {
         console.log("started to stream");
-    }), (err) => {
+    }), (err: Error) => {
         console.error("failed to stream", err)
     };
 
