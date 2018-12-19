@@ -1,4 +1,5 @@
 import * as WebSocket from 'ws';
+import * as http from 'http';
 import * as events from 'events';
 import { IncomingMessage } from 'http';
 import { IRobotWebsocketServer } from './IRobotWebsocketServer';
@@ -7,14 +8,15 @@ import { IRobotMessage } from './IRobotMessage';
 export class RobotWebsocketServer extends events.EventEmitter implements IRobotWebsocketServer {
     private wss: WebSocket.Server;
 
-    public constructor(public path: string, public port: number, callback: () => void) {
+    public constructor(path: string, httpServer: http.Server, callback: () => void) {
         super();
 
         this.wss = new WebSocket.Server({
-            path, 
-            port
-        }, callback);
-    
+            server: httpServer,
+            path
+        });
+
+        this.wss.once('listening', callback);
         this.wss.on('connection', this.connectionHandler.bind(this));
     }
 

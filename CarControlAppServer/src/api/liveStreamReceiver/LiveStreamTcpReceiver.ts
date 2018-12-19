@@ -37,7 +37,6 @@ export class LiveStreamTcpReceiver extends events.EventEmitter implements ILiveS
         return new Promise((resolve, reject) => {
             this.tcpReceiverServer.close(() => {
                 resolve();
-                // todo: when to reject??
             })
         })
     }

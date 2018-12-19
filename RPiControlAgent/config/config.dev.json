@@ -10,7 +10,7 @@
         "serialPortName": "X"
     }, 
     "api": {
-        "url": "ws://localhost:3001/robot",
+        "url": "ws://localhost:3000/api/robot",
         "retryPolicy": {
             "maxConnectionAttempts": "10"
         }

@@ -4,7 +4,6 @@ export class Config {
     };
 
     public robotWsServer: {
-        port: number,
         path: string
     };
 
