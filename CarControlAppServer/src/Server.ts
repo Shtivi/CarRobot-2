@@ -12,6 +12,8 @@ import { RobotWebsocketServer } from './api/robotWebsocketServer/RobotWebsocketS
 import { ICapturesManager } from './captures/ICapturesManager';
 import { CapturesManager } from './captures/CapturesManager';
 import { CapturesAPI } from './api/CapturesAPI';
+import { WebsocketServer } from './api/websocketServer/WebsocketServer';
+import { LiveStreamingServer } from './api/LiveStreamingServer';
 
 function main() {
     console.log("starting server initialization");
@@ -25,13 +27,15 @@ function main() {
     const httpServer: http.Server = http.createServer(app)
 
     console.log("booting up robot web socket server");    
-    const robotWsServer: IRobotWebsocketServer = new RobotWebsocketServer(config.robotWsServer.path, httpServer, () => {
-        console.log(`robot web socket server is listenning at: ws://localhost:${config.httpServer.port}${config.robotWsServer.path}`);
-    }).on('connection', () => console.log('robot connected'))
+    const robotWsServer: IRobotWebsocketServer = new RobotWebsocketServer(config.robotWsServer.path, httpServer)
+        .on('connection', () => console.log('robot connected'))
         .on('disconnection', () => console.log('robot disconnected'))
         .on('capture', (base64Data: string) => {
             console.log("captured");
         })
+    
+    console.log("booting up user notifications websocket server");
+    
     
     const capturesManager: ICapturesManager = new CapturesManager("");
 
@@ -61,23 +65,9 @@ function main() {
         console.error("failed to start live streaming receiver", err);
     });
     
-    // todo: put in config
     console.log("booting up streaming server");
-    const liveStreamingServer = new WebSocket.Server({ port: 3004, path: '/streaming' }, () => {
-        console.log(`live streaming server is on ws://localhost:${3004}/streaming`);
-        liveStreamReceiver.on('data', (data: any) => {
-            liveStreamingServer.clients.forEach((client: WebSocket) => {
-                if (client.readyState == 1) {
-                    client.send(data, {binary: true}, (err: Error) => {
-                        if (err) {
-                            console.error("error sending the streaming data to client", err);
-                            client.close();
-                        }
-                    });
-                }
-            });
-        });
-    });
+    const liveStreamingServer: LiveStreamingServer = 
+        new LiveStreamingServer(config.liveStreamingServer.path, httpServer, liveStreamReceiver);
 }
 
 main();

@@ -1,22 +1,20 @@
 import * as WebSocket from 'ws';
 import * as http from 'http';
 import * as events from 'events';
+import * as url from 'url';
 import { IncomingMessage } from 'http';
 import { IRobotWebsocketServer } from './IRobotWebsocketServer';
 import { IRobotMessage } from './IRobotMessage';
+import { Socket } from 'net';
+import { Optional } from '../../utils/Optional';
+import { WebsocketServer } from '../websocketServer/WebsocketServer';
 
 export class RobotWebsocketServer extends events.EventEmitter implements IRobotWebsocketServer {
-    private wss: WebSocket.Server;
+    private wss: WebsocketServer;
 
-    public constructor(path: string, httpServer: http.Server, callback: () => void) {
+    public constructor(private path: string, private httpServer: http.Server) {
         super();
-
-        this.wss = new WebSocket.Server({
-            server: httpServer,
-            path
-        });
-
-        this.wss.once('listening', callback);
+        this.wss = new WebsocketServer(path, httpServer);
         this.wss.on('connection', this.connectionHandler.bind(this));
     }
 
@@ -26,15 +24,8 @@ export class RobotWebsocketServer extends events.EventEmitter implements IRobotW
         }
 
         return new Promise((resolve, reject) => {
-            this.wss.clients.forEach((socket: WebSocket) => {
-                socket.send(command, (err?: Error) => {
-                    if (err) {
-                        reject(err);
-                        return;
-                    }
-                    resolve([]);
-                })
-            })
+            this.wss.broadcast(command);
+            resolve([]);
         })
     }
 
