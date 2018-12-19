@@ -62,3 +62,6 @@ typings/
 
 # ts build
 /*/build/*
+
+# captures folder
+CarControlAppServer/captures

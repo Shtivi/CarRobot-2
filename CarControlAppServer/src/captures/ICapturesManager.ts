@@ -4,7 +4,7 @@ export interface ICapturesManager {
     getLatestCaptures(limit: number): Promise<ICapture[]>
     getCapture(id: number): Promise<ICapture>;
     searchCaptures(text: string): Promise<ICapture[]>;
-    newCapture(capture: ICapture): Promise<void>;
-    updateCaptureDetails(capture: ICapture): Promise<void>;
+    newCapture(data: any): Promise<ICapture>;
+    updateCaptureDetails(capture: ICapture): Promise<ICapture>;
     deleteCapture(id: number): Promise<void>;
 }

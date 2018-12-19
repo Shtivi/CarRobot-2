@@ -3,6 +3,7 @@ import * as http from 'http'
 import { Config } from './config/Config';
 import ConfigLoader from './config/ConfigLoader';
 import * as WebSocket from 'ws';
+import * as path from 'path';
 import { CommandsAPI } from './api/CommandsAPI';
 import { IRouter } from 'express-serve-static-core';
 import { ILiveStreamReceiver } from './api/liveStreamReceiver/ILiveStreamReceiver';
@@ -14,6 +15,7 @@ import { CapturesManager } from './captures/CapturesManager';
 import { CapturesAPI } from './api/CapturesAPI';
 import { WebsocketServer } from './api/websocketServer/WebsocketServer';
 import { LiveStreamingServer } from './api/LiveStreamingServer';
+import { ICapture } from './captures/ICapture';
 
 function main() {
     console.log("starting server initialization");
@@ -26,18 +28,22 @@ function main() {
     const app: express.Application = express();
     const httpServer: http.Server = http.createServer(app)
 
+    // BL
+    const capturesManager: ICapturesManager = new CapturesManager(path.join(__dirname, "../", config.captures.dirName));
+
     console.log("booting up robot web socket server");    
     const robotWsServer: IRobotWebsocketServer = new RobotWebsocketServer(config.robotWsServer.path, httpServer)
         .on('connection', () => console.log('robot connected'))
         .on('disconnection', () => console.log('robot disconnected'))
         .on('capture', (base64Data: string) => {
-            console.log("captured");
+            console.log("recieved capture, saving...");
+
+            capturesManager.newCapture(base64Data).then((capture: ICapture) => {
+                console.log(`saved as ${capture.details.fileName}`);
+            }).catch((err) => console.error('failed saving capture', err));
         })
     
     console.log("booting up user notifications websocket server");
-    
-    
-    const capturesManager: ICapturesManager = new CapturesManager("");
 
     console.log("booting up http server");
     const generalRouter: IRouter = Router().use((req, res, next) => {

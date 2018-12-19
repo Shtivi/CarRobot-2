@@ -14,4 +14,8 @@ export class Config {
     public liveStreamingReceiver: {
         port: number
     }
+
+    public captures: {
+        dirName: string
+    }
 }

@@ -10,5 +10,8 @@
     },
     "liveStreamingReceiver": {
         "port": 3003
+    },
+    "captures": {
+        "dirName": "captures"
     }
 }
