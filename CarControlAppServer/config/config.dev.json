@@ -5,6 +5,9 @@
     "robotWsServer": {
         "path": "/api/robot"
     },
+    "liveStreamingServer": {
+        "path": "/api/streaming"
+    },
     "liveStreamingReceiver": {
         "port": 3003
     }
