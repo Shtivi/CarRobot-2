@@ -36,7 +36,9 @@ export class CapturesDao extends BaseMongooseDao<ICaptureInfoModel> implements I
     public addNewCapture(info: ICaptureInfo): Promise<void> {
         const doc: ICaptureInfoModel = new this.model(info);
         return new Promise((resolve, reject) => {
-            doc.save(() => resolve()).catch(reject);
+            doc.save()
+                .then(() => resolve())
+                .catch(reject);
         });
     }
 }

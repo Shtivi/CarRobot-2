@@ -20,6 +20,8 @@ import { IDatabaseConfig } from './config/IDatabaseConfig';
 import { connect, connection } from 'mongoose';
 import { DBConnection } from './dal/mongoose/DBConnection';
 import { CapturesDao } from './dal/mongoose/CapturesDao';
+import { IUserNotificationsService } from './api/userNotificationsService/IUserNotificationsService';
+import { UserNotificationsService } from './api/userNotificationsService/UserNotificationsService';
 
 function main() {
     console.log("starting server initialization");
@@ -39,6 +41,10 @@ function main() {
 
     connectDatabase(dbConfig);
 
+    console.log("booting up user notifications service");
+    const userNotificationsService: IUserNotificationsService = 
+        new UserNotificationsService(config.notificationsService.path, httpServer);
+
     console.log("booting up robot web socket server");    
     const robotWsServer: IRobotWebsocketServer = new RobotWebsocketServer(config.robotWsServer.path, httpServer)
         .on('connection', () => console.log('robot connected'))
@@ -48,7 +54,11 @@ function main() {
 
             capturesManager.newCapture(base64Data).then((capture: ICapture) => {
                 console.log(`saved as ${capture.info.fileName}`);
-            }).catch((err) => console.error('failed saving capture', err));
+                userNotificationsService.sendNotification('newCapture', capture.info);
+            }).catch((err) => {
+                console.error('failed saving capture', err)
+                userNotificationsService.sendNotification("error", new Error(`An error occured while capturing: "${err}"`));
+            });
         })
     
     console.log("booting up user notifications websocket server");
