@@ -2,6 +2,9 @@
     "httpServer": {
         "port": 3000
     },
+    "notificationsService": {
+        "path": "/api/notifications"
+    },
     "robotWsServer": {
         "path": "/api/robot"
     },

@@ -1,7 +1,11 @@
 export class Config {
     public httpServer: {
-        port: number,
+        port: number
     };
+
+    public notificationsService: {
+        path: string
+    }
 
     public robotWsServer: {
         path: string
