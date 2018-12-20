@@ -13,5 +13,8 @@
     },
     "captures": {
         "dirName": "captures"
+    },
+    "database": {
+        "configFile": "db.config.json"
     }
 }

@@ -1,4 +1,4 @@
-import { ICapture } from "./ICapture";
+import { ICapture } from "../models/captures/ICapture";
 
 export interface ICapturesManager {
     getLatestCaptures(limit: number): Promise<ICapture[]>

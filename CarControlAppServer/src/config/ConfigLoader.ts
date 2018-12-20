@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { Config } from './Config';
+import { IDatabaseConfig } from './IDatabaseConfig';
 
 class ConfigLoader {
     public loadConfig(environment: string): Config {
@@ -9,8 +10,14 @@ class ConfigLoader {
         }
 
         let filePath: string = path.join(__dirname, `../../config/config.${environment.toLowerCase()}.json`);
-        let configFileContext: string = fs.readFileSync(filePath).toString();
-        return JSON.parse(configFileContext);
+        let configFileContent: string = fs.readFileSync(filePath).toString();
+        return JSON.parse(configFileContent);
+    }
+
+    public loadDatabaseConfig(filename: string): IDatabaseConfig {
+        const filePath: string = path.join(__dirname, `../../config/${filename}`);
+        const fileContent: string = fs.readFileSync(filePath).toString();
+        return JSON.parse(fileContent);
     }
 }
 

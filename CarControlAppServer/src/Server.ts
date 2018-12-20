@@ -15,7 +15,11 @@ import { CapturesManager } from './captures/CapturesManager';
 import { CapturesAPI } from './api/CapturesAPI';
 import { WebsocketServer } from './api/websocketServer/WebsocketServer';
 import { LiveStreamingServer } from './api/LiveStreamingServer';
-import { ICapture } from './captures/ICapture';
+import { ICapture } from './models/captures/ICapture';
+import { IDatabaseConfig } from './config/IDatabaseConfig';
+import { connect, connection } from 'mongoose';
+import { DBConnection } from './dal/mongoose/DBConnection';
+import { CapturesDao } from './dal/mongoose/CapturesDao';
 
 function main() {
     console.log("starting server initialization");
@@ -24,12 +28,16 @@ function main() {
     
     console.log("loading configuration");
     const config: Config = ConfigLoader.loadConfig(environment);
+    const dbConfig: IDatabaseConfig = ConfigLoader.loadDatabaseConfig(config.database.configFile);
     
     const app: express.Application = express();
     const httpServer: http.Server = http.createServer(app)
 
     // BL
-    const capturesManager: ICapturesManager = new CapturesManager(path.join(__dirname, "../", config.captures.dirName));
+    const capturesManager: ICapturesManager = 
+        new CapturesManager(path.join(__dirname, "../", config.captures.dirName), new CapturesDao());
+
+    connectDatabase(dbConfig);
 
     console.log("booting up robot web socket server");    
     const robotWsServer: IRobotWebsocketServer = new RobotWebsocketServer(config.robotWsServer.path, httpServer)
@@ -39,7 +47,7 @@ function main() {
             console.log("recieved capture, saving...");
 
             capturesManager.newCapture(base64Data).then((capture: ICapture) => {
-                console.log(`saved as ${capture.details.fileName}`);
+                console.log(`saved as ${capture.info.fileName}`);
             }).catch((err) => console.error('failed saving capture', err));
         })
     
@@ -74,6 +82,22 @@ function main() {
     console.log("booting up streaming server");
     const liveStreamingServer: LiveStreamingServer = 
         new LiveStreamingServer(config.liveStreamingServer.path, httpServer, liveStreamReceiver);
+}
+
+function connectDatabase(dbconfig: IDatabaseConfig) {
+    console.log("connecting to database...");
+
+    const connectionString: string = DBConnection.buildMongoConnectionString(dbconfig);
+
+    connect(connectionString).then(() => {
+        console.log("connected to database");
+
+        connection.once('disconnected', () => {
+            console.log("database disconnected");
+        })
+    }).catch((err) => {
+        console.error("failed to connect to database", err);
+    })
 }
 
 main();

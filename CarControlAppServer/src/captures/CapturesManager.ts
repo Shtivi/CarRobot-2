@@ -1,12 +1,13 @@
 import { ICapturesManager } from "./ICapturesManager";
-import { ICapture } from "./ICapture";
-import { ImageSize } from "./ImageSize";
+import { ICapture } from "../models/captures/ICapture";
+import { ImageSize } from "../models/captures/ImageSize";
 const imageSize = require('image-size');
 import * as fs from 'fs';
 import * as path from 'path';
+import { ICapturesDao } from "../dal/ICapturesDao";
 
 export class CapturesManager implements ICapturesManager {
-    public constructor(private capturesDirPath: string) {
+    public constructor(private capturesDirPath: string, private capturesDao: ICapturesDao) {
         this.createDirIfDoesntExist(this.capturesDirPath).catch((err: NodeJS.ErrnoException) => {
             console.error(`failed to create captures directory at path: '${capturesDirPath}`, err);
         });
@@ -41,7 +42,7 @@ export class CapturesManager implements ICapturesManager {
 
                 const captureModel: ICapture = {
                     data: capture,
-                    details: {
+                    info: {
                         extension: 'jpeg',
                         fileName: `${captureTime.getTime()}.jpeg`,
                         height: imageDimensions.height,
@@ -54,7 +55,9 @@ export class CapturesManager implements ICapturesManager {
                     }
                 }
                 
-                resolve(captureModel);
+                this.capturesDao.addNewCapture(captureModel.info)
+                    .then(() => resolve(captureModel))
+                    .catch(reject);
             });
         })
     }

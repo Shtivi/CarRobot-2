@@ -18,4 +18,8 @@ export class Config {
     public captures: {
         dirName: string
     }
+
+    public database: {
+        configFile: string
+    }
 }

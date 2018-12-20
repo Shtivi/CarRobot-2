@@ -65,3 +65,6 @@ typings/
 
 # captures folder
 CarControlAppServer/captures
+
+# db config
+CarControlAppServer/config/db.config.json
