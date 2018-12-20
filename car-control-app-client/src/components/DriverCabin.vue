@@ -16,11 +16,15 @@ import { ControlOptions } from '@/models/ControlOptions';
 import { CommandsDispatcherApi } from '@/services/CommandsDispatcherApi';
 import VideoControls from './VideoControls.vue';
 import config, { IConfig } from '@/config/Config';
+import { State, Action, Getter, Mutation } from 'vuex-class';
 
 @Component({
     components: {NavigationControl, LiveStreamPlayer, VideoControls}
 })
 export default class DriverCabin extends Vue {
+    @Action('connectNotificationsService')
+    private connectNotificationsService!: () => void;
+    
     get config(): IConfig {
         return config;
     }
@@ -82,6 +86,10 @@ export default class DriverCabin extends Vue {
                 ]
             }
         }
+    }
+
+    private mounted(): void {
+        this.connectNotificationsService();
     }
 }
 

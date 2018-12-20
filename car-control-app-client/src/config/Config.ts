@@ -16,6 +16,9 @@ class Config implements IConfig {
         url: this.serverUrl + "/api",
         routes: {
             sendCommand: "commands"
+        },
+        notificationsService: {
+            url: "ws://192.168.1.41:3000/api/notifications"
         }
     }
 

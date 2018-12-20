@@ -1,5 +1,7 @@
-import { Notifications } from '@/services/Notifications';
+import { NotificationsPrinter } from '@/services/NotificationsPrinter';
+import { INotificationsServiceApi } from '@/services/NotificationsServiceApi';
 
 export interface INotificationsState {
-    notificationsService: Notifications
+    notificationsPrinter: NotificationsPrinter,
+    pushNotificationsService: INotificationsServiceApi
 }

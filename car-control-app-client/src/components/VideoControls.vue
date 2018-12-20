@@ -66,7 +66,7 @@ export default class VideoControls extends Vue {
     @Action('capture')
     private capture!: () => Promise<string[]>;
 
-    @Action('notification')
+    @Action('showNotification')
     private showNotification!: (options: IToastOptions) => void;
 
     private dispatchStartLiveStreaming(): void {

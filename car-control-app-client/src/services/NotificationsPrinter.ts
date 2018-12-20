@@ -3,7 +3,7 @@ import { IToastOptions } from '@/models/IToastOptions';
 import MdSnackbar from 'vue-material';
 import { ExtendedVue } from 'vue/types/vue';
 
-export class Notifications {
+export class NotificationsPrinter {
     public constructor() {}
 
     public showInfoToast(options: IToastOptions): Promise<void> {
