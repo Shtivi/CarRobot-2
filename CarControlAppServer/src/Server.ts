@@ -23,46 +23,41 @@ import { CapturesDao } from './dal/mongoose/CapturesDao';
 import { IUserNotificationsService } from './api/userNotificationsService/IUserNotificationsService';
 import { UserNotificationsService } from './api/userNotificationsService/UserNotificationsService';
 
+let config: Config;
+let dbConfig: IDatabaseConfig;
+
+let app: express.Application;
+let httpServer: http.Server;
+let userNotificationsService: IUserNotificationsService;
+let robotWsServer: IRobotWebsocketServer;
+let liveStreamReceiver: ILiveStreamReceiver;
+let liveStreamingServer: LiveStreamingServer;
+
 function main() {
     console.log("starting server initialization");
     const environment: string = (process.env.NODE_ENV ? process.env.NODE_ENV.trim().toUpperCase() : 'PROD');
     console.log(`environment set to: ${environment}`);
-    
     console.log("loading configuration");
-    const config: Config = ConfigLoader.loadConfig(environment);
-    const dbConfig: IDatabaseConfig = ConfigLoader.loadDatabaseConfig(config.database.configFile);
+    config = ConfigLoader.loadConfig(environment);
+    dbConfig = ConfigLoader.loadDatabaseConfig(config.database.configFile);
     
-    const app: express.Application = express();
-    const httpServer: http.Server = http.createServer(app)
+    app = express();
+    httpServer = http.createServer(app)
+    connectDatabase(dbConfig);
 
     // BL
     const capturesManager: ICapturesManager = 
         new CapturesManager(path.join(__dirname, "../", config.captures.dirName), new CapturesDao());
 
-    connectDatabase(dbConfig);
-
     console.log("booting up user notifications service");
-    const userNotificationsService: IUserNotificationsService = 
-        new UserNotificationsService(config.notificationsService.path, httpServer);
+    userNotificationsService = new UserNotificationsService(config.notificationsService.path, httpServer);
 
     console.log("booting up robot web socket server");    
-    const robotWsServer: IRobotWebsocketServer = new RobotWebsocketServer(config.robotWsServer.path, httpServer)
-        .on('connection', () => console.log('robot connected'))
-        .on('disconnection', () => console.log('robot disconnected'))
-        .on('capture', (base64Data: string) => {
-            console.log("recieved capture, saving...");
-
-            capturesManager.newCapture(base64Data).then((capture: ICapture) => {
-                console.log(`saved as ${capture.info.fileName}`);
-                userNotificationsService.sendNotification('newCapture', capture.info);
-            }).catch((err) => {
-                console.error('failed saving capture', err)
-                userNotificationsService.sendNotification("error", new Error(`An error occured while capturing: "${err}"`));
-            });
-        })
+    robotWsServer = new RobotWebsocketServer(config.robotWsServer.path, httpServer)
+        .on('connection', () => robotConnectionChangedHook(true))
+        .on('disconnection', () => robotConnectionChangedHook(false))
+        .on('capture', (data: string) => capturedHook(data, capturesManager));
     
-    console.log("booting up user notifications websocket server");
-
     console.log("booting up http server");
     const generalRouter: IRouter = Router().use((req, res, next) => {
             res.header("Access-Control-Allow-Origin", "*");
@@ -78,7 +73,7 @@ function main() {
     });
 
     console.log("booting up live streaming tcp receiver");
-    const liveStreamReceiver: ILiveStreamReceiver = new LiveStreamTcpReceiver(config.liveStreamingReceiver.port);
+    liveStreamReceiver = new LiveStreamTcpReceiver(config.liveStreamingReceiver.port);
     liveStreamReceiver.on('cameraConnection', () => {
         console.log("camera connected");
     }).on('cameraDisconnection', () => {
@@ -90,8 +85,24 @@ function main() {
     });
     
     console.log("booting up streaming server");
-    const liveStreamingServer: LiveStreamingServer = 
-        new LiveStreamingServer(config.liveStreamingServer.path, httpServer, liveStreamReceiver);
+    liveStreamingServer = new LiveStreamingServer(config.liveStreamingServer.path, httpServer, liveStreamReceiver);
+}
+
+function robotConnectionChangedHook(isConnected: boolean) {
+    console.log(`robot ${isConnected ? 'connected' : 'disconnected'}`);
+    userNotificationsService.sendNotification('robotConnectionStateChanged', isConnected);
+}
+
+function capturedHook(base64Data: string, capturesManager: ICapturesManager): void {
+    console.log("recieved capture, saving...");
+
+    capturesManager.newCapture(base64Data).then((capture: ICapture) => {
+        console.log(`saved as ${capture.info.fileName}`);
+        userNotificationsService.sendNotification('newCapture', capture.info);
+    }).catch((err) => {
+        console.error('failed saving capture', err)
+        userNotificationsService.sendNotification("error", new Error(`An error occured while capturing: "${err}"`));
+    });
 }
 
 function connectDatabase(dbconfig: IDatabaseConfig) {

@@ -9,7 +9,17 @@ export class CapturesAPI extends BaseApiRouter {
     }
 
     private getLatestCaptures(req: Request, res: Response): void {
+        const parsedLimit: number = parseInt(req.query.limit);
+        const parsedTime: number = parseInt(req.query.untilTime);
 
+        const fixedLimit: number = !isNaN(parsedLimit) ? parsedLimit : 10;
+        const fixedTime: number = !isNaN(parsedTime) ? parsedTime : Date.now();
+
+        this.capturesManager.getLatestCaptures(fixedLimit, fixedTime).then((data) => {
+            res.json(data);
+        }).catch(err => {
+            res.status(500).json(err);
+        })
     }
 
     private getCaptureById(req: Request, res: Response): void {
@@ -32,7 +42,7 @@ export class CapturesAPI extends BaseApiRouter {
 
     protected buildRoutes(): RouteAction[] {
         return [
-            new RouteAction(HttpMethod.GET, '/latest/:limit', this.getLatestCaptures),
+            new RouteAction(HttpMethod.GET, '/latest', this.getLatestCaptures),
             new RouteAction(HttpMethod.GET, '/:id', this.getCaptureById),
             new RouteAction(HttpMethod.GET, '/search', this.searchCaptures),
             new RouteAction(HttpMethod.PUT, '/:id', this.updateCaptureDetails),
