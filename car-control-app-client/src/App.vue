@@ -24,4 +24,14 @@ export default class App extends Vue {}
 //   text-align: center;
 //   color: #2c3e50;
 // }
+.toasted-container {
+    &.top-right {
+        top: 2%!important;
+        right: 2%!important;
+    }
+
+    .toasted .action:hover {
+        text-decoration: none!important;
+    }
+}
 </style>

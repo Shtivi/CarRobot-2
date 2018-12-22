@@ -9,6 +9,7 @@ export interface INotificationsServiceApi {
     isConnected(): boolean;
 
     on(event: 'newCapture', cb: (data: ICaptureInfo) => void): INotificationsServiceApi;
+    on(event: 'robotConnectionStateChanged', cb: (isConnected: boolean) => void): INotificationsServiceApi;
 
     on(event: 'error', cb: (err: Error) => void): INotificationsServiceApi;
     on(event: 'connected', cb: () => void): INotificationsServiceApi;
