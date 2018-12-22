@@ -26,7 +26,8 @@ export class NotificationsServiceApi extends events.EventEmitter implements INot
 
     public connect(url: string): void {
         if (this.isConnected()) {
-            throw new Error("Already connected to notifications service");
+            this.emit('error', new Error("already connected to notifications service"));
+            return;
         }
 
         this.socket = Optional.of(new WebSocket(url));
@@ -37,8 +38,9 @@ export class NotificationsServiceApi extends events.EventEmitter implements INot
     }
 
     public disconnect(): void {
-        if (!this.isConnected()) {
-            throw new Error('Cannot disconnect, not connected from the first place');
+        if (this.isConnected()) {
+            this.emit('error', new Error('Cannot disconnect, not connected from the first place'));
+            return;
         }
 
         this.socket.get().close(1000, "according to user's reequest");

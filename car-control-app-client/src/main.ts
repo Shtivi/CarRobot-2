@@ -23,6 +23,7 @@ import Vuex, { StoreOptions } from 'vuex';
 import { IRootState } from './store/IRootState';
 import { liveStreamingModule } from './store/modules/liveStreaming/LiveStreamingModule';
 import { notificationsModule } from './store/modules/notifications/NotificationsModule';
+import { measurementsModule } from './store/modules/measurements/MeasurementsModule';
 
 Vue.use(Vuex);
 
@@ -32,7 +33,8 @@ const store: StoreOptions<IRootState> = {
     },
     modules: {
         liveStreaming: liveStreamingModule,
-        notifications: notificationsModule
+        notifications: notificationsModule,
+        measurements: measurementsModule
     }
 }
 

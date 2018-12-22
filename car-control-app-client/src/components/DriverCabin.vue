@@ -1,6 +1,7 @@
 <template>
     <div class="driver-cabin">
         <live-stream-player></live-stream-player>
+        <side-box></side-box>
         <navigation-control side='left' v-bind:commandsDispatcher="commandsDispatcher" v-bind:controlOptions="controls.driving"></navigation-control>
         <navigation-control side='right' v-bind:commandsDispatcher="commandsDispatcher" v-bind:controlOptions="controls.cameraTilt"></navigation-control>
         <video-controls></video-controls>
@@ -10,6 +11,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import NavigationControl from './NavigationControl.vue';
+import SideBox from './SideBox.vue';
 import LiveStreamPlayer from './LiveStreamPlayer.vue';
 import { ControlViewOption } from '@/models/ControlViewOption';
 import { ControlOptions } from '@/models/ControlOptions';
@@ -19,7 +21,7 @@ import config, { IConfig } from '@/config/Config';
 import { State, Action, Getter, Mutation } from 'vuex-class';
 
 @Component({
-    components: {NavigationControl, LiveStreamPlayer, VideoControls}
+    components: {NavigationControl, LiveStreamPlayer, VideoControls, SideBox}
 })
 export default class DriverCabin extends Vue {
     @Action('connectNotificationsService')

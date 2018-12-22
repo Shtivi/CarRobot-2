@@ -44,7 +44,7 @@ export class NotificationsPrinter {
         })
 
         return {
-            // duration: options.duration || 6000,
+            duration: options.duration || 3000,
             closeOnSwipe: true,
             fitToScreen: true,
             type: 'default',

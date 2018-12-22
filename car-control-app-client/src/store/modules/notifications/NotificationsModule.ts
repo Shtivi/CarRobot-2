@@ -27,15 +27,35 @@ export const notificationsModule: Module<INotificationsState, IRootState> = {
                 .on('connected', () => console.log('connected to push notifications'))
                 .on('disconnected', () => console.log('disconnected from push notifications'))
                 .on('newCapture', (capture: ICaptureInfo) => {
-                    dispatch('showNotification', { label: `Capture saved as '${capture.name}'` });
+                    dispatch('showNotification', <IToastOptions> { 
+                        label: `Capture saved as '${capture.name}'`,
+                        actions: [{
+                            label: 'VIEW',
+                            callback: (hideToast: () => void) => {
+                                // todo: open gallery
+                                hideToast();
+                            }
+                        }]
+                    });
                 })
                 .on('robotConnectionStateChanged', (isConnected: boolean) => {
+                    commit('setMeasurementValue', {
+                        measurementName: 'robotConnection',
+                        value: isConnected
+                    })
                     dispatch('showNotification', { label: `Robot ${isConnected ? 'connected' : 'disconnected'}`});
                 })
+                .on('error', (err: Error) => dispatch('showError', { label: err }))
             state.pushNotificationsService.connect(Config.api.notificationsService.url);
         },
         showNotification({ state }, payload: IToastOptions) {
             state.notificationsPrinter.showInfoToast(payload);
+        },
+        showError({ state }, payload: IToastOptions) {
+            state.notificationsPrinter.showErrorToast(payload);
+        },
+        showWarning({ state }, payload: IToastOptions) {
+            state.notificationsPrinter.showWarningToast(payload);
         }
     }
 }
