@@ -12,6 +12,36 @@ export class CapturesDao extends BaseMongooseDao<ICaptureInfoModel> implements I
         super();
     }
     
+    // API
+
+    public fetchByTimestamp(time: number): Promise<ICaptureInfo> {
+        throw new Error("Method not implemented.");
+    }
+
+    public addNewCapture(info: ICaptureInfo): Promise<void> {
+        const doc: ICaptureInfoModel = new this.model(info);
+        return new Promise((resolve, reject) => {
+            doc.save()
+                .then(() => resolve())
+                .catch(reject);
+        });
+    }
+
+    public fetchLatest(limit: number, untilTime: number): Promise<ICaptureInfo[]> {
+        return new Promise((resolve, reject) => {
+            this.model.find({ time: { $lte: untilTime+1 } }).sort({ time: '-1' }).limit(limit).exec((err: any, res: ICaptureInfoModel[]) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                resolve(res.map((doc: ICaptureInfoModel) => doc.toObject()));              
+            });
+        })
+    }
+
+    // Mongoose
+
     protected createSchema(): Schema {
         return new Schema({
             time: Number,
@@ -25,20 +55,8 @@ export class CapturesDao extends BaseMongooseDao<ICaptureInfoModel> implements I
             height: Number,
         })    
     }
+
     protected schemaName(): string {
         return 'captures';
-    }
-    
-    public fetchByTimestamp(time: number): Promise<ICaptureInfo> {
-        throw new Error("Method not implemented.");
-    }
-
-    public addNewCapture(info: ICaptureInfo): Promise<void> {
-        const doc: ICaptureInfoModel = new this.model(info);
-        return new Promise((resolve, reject) => {
-            doc.save()
-                .then(() => resolve())
-                .catch(reject);
-        });
     }
 }

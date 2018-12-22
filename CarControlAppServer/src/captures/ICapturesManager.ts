@@ -1,7 +1,7 @@
 import { ICapture } from "../models/captures/ICapture";
 
 export interface ICapturesManager {
-    getLatestCaptures(limit: number): Promise<ICapture[]>
+    getLatestCaptures(limit: number, untilTime: number): Promise<ICapture[]>
     getCapture(id: number): Promise<ICapture>;
     searchCaptures(text: string): Promise<ICapture[]>;
     newCapture(data: any): Promise<ICapture>;

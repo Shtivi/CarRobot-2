@@ -5,6 +5,7 @@ const imageSize = require('image-size');
 import * as fs from 'fs';
 import * as path from 'path';
 import { ICapturesDao } from "../dal/ICapturesDao";
+import { ICaptureInfo } from "../models/captures/ICapturInfo";
 
 export class CapturesManager implements ICapturesManager {
     public constructor(private capturesDirPath: string, private capturesDao: ICapturesDao) {
@@ -15,8 +16,32 @@ export class CapturesManager implements ICapturesManager {
 
     /** API */
 
-    public getLatestCaptures(limit: number): Promise<ICapture[]> {
-        throw new Error("Method not implemented.");
+    public getLatestCaptures(limit: number, untilTime: number): Promise<ICapture[]> {
+        if (limit < 0 || limit > 10) {
+            return Promise.reject("limit must be between zero and 10");
+        }
+
+        if (untilTime < 0) {
+            return Promise.reject("invalid time filter");
+        }
+
+        return new Promise((resolve, reject) => {
+            return this.capturesDao.fetchLatest(limit, untilTime).then((captureInfos: ICaptureInfo[]) => {
+                const picFilePromises: Promise<string>[] = 
+                    captureInfos.map((info: ICaptureInfo) => this.getPictureFile(this.formatPicturePath(info.fileName)));
+                
+                Promise.all(picFilePromises).then((picsData: string[]) => {
+                    let captures: ICapture[] =  picsData.map((data: string, index: number) => {
+                        return {
+                            info: captureInfos[index],
+                            data: picsData[index]
+                        }
+                    })
+
+                    resolve(captures);
+                }).catch(err => reject(err));
+            });
+        })
     }    
     
     public getCapture(id: number): Promise<ICapture> {
@@ -100,5 +125,27 @@ export class CapturesManager implements ICapturesManager {
                 }
             });
         });
+    }
+
+    private formatPicturePath(filename: string): string {
+        return path.join(this.capturesDirPath, filename);
+    }
+
+    private getPictureFile(path: string): Promise<string> {
+        return new Promise((resolve, reject) => {
+            fs.exists(path, (exists: boolean) => {
+                if (!exists) {
+                    resolve("")
+                }
+            });
+
+            fs.readFile(path, (err: NodeJS.ErrnoException, data: Buffer) => {
+                if (err) {
+                    (err);
+                    return;
+                }
+                resolve(data.toString('base64'));
+            })
+        })
     }
 }
