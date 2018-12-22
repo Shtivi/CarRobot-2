@@ -66,7 +66,7 @@ export default class DriverCabin extends Vue {
                     {
                         icon: 'arrow_right',
                         index: 1,
-                        action: ''
+                        action: 'TILT_RIGHT'
                     }, 
                     {
                         icon: 'arrow_drop_down',
@@ -76,7 +76,7 @@ export default class DriverCabin extends Vue {
                     {
                         icon: 'arrow_left',
                         index: 3,
-                        action: ''
+                        action: 'TILT_LEFT'
                     }, 
                     {
                         icon: 'arrow_drop_up',

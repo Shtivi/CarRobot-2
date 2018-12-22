@@ -9,11 +9,14 @@ import MdButton from 'vue-material';
 import MdIcon from 'vue-material';
 import MdProgressSpinner from 'vue-material';
 import MdSnackbar from 'vue-material';
-
 Vue.use(MdButton);
 Vue.use(MdIcon);
 Vue.use(MdProgressSpinner);
 Vue.use(MdSnackbar);
+
+/* Vue Toasted */
+import Toasted from 'vue-toasted';
+Vue.use(Toasted);
 
 /* Vuex */
 import Vuex, { StoreOptions } from 'vuex';

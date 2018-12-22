@@ -23,11 +23,15 @@ export const notificationsModule: Module<INotificationsState, IRootState> = {
     },
     actions: {
         connectNotificationsService({ state, dispatch, commit }) {
-            state.pushNotificationsService.on('connected', () => console.log('connected to push notifications'));
-            state.pushNotificationsService.on('disconnected', () => console.log('disconnected from push notifications'));
-            state.pushNotificationsService.on('newCapture', (capture: ICaptureInfo) => {
-                dispatch('showNotification', { label: `Capture saved as '${capture.name}'` });
-            });
+            state.pushNotificationsService
+                .on('connected', () => console.log('connected to push notifications'))
+                .on('disconnected', () => console.log('disconnected from push notifications'))
+                .on('newCapture', (capture: ICaptureInfo) => {
+                    dispatch('showNotification', { label: `Capture saved as '${capture.name}'` });
+                })
+                .on('robotConnectionStateChanged', (isConnected: boolean) => {
+                    dispatch('showNotification', { label: `Robot ${isConnected ? 'connected' : 'disconnected'}`});
+                })
             state.pushNotificationsService.connect(Config.api.notificationsService.url);
         },
         showNotification({ state }, payload: IToastOptions) {
