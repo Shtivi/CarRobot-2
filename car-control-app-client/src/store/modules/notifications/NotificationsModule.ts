@@ -30,11 +30,14 @@ export const notificationsModule: Module<INotificationsState, IRootState> = {
                     dispatch('showNotification', <IToastOptions> { 
                         label: `Capture saved as '${capture.name}'`,
                         actions: [{
-                            label: 'VIEW',
+                            label: 'SHOW ME',
                             callback: (hideToast: () => void) => {
                                 // todo: open gallery
                                 hideToast();
                             }
+                        }, {
+                            label: 'OK',
+                            callback: (hideToast: () => void) => hideToast()
                         }]
                     });
                 })

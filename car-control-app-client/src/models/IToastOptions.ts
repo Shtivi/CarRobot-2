@@ -1,12 +1,14 @@
 import { Optional } from '@/utils/Optional';
 
+interface IToastAction {
+    callback: (hideToast: () => void) => void;
+    label: string | undefined;
+    icon: string | undefined;
+}
+
 export interface IToastOptions {
     label: string;
     duration?: number;
     icon?: string;
-    actions?: [{
-        label?: string,
-        callback: (hideToast: () => void) => void,
-        icon?: string
-    }]
+    actions?: IToastAction[]
 }

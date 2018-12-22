@@ -1,17 +1,23 @@
 #include <AFMotor.h>
 #include <Servo.h>
 
+// Motors
+
 AF_DCMotor rightMotor(4);
 AF_DCMotor leftMotor(1);
 
 Servo cameraY;
 Servo cameraX;
 
+// Ultrasonic 
 int US_TRIG_PIN = A0;
 int US_ECHO_PIN = A1;
+
+// Measurements
 int MEASURE_DELAY = 250;
 long lastMeasureTime;
 
+// Commands
 String FORWARD_CMD = "DRIVE_FORWARD";
 String BACKWARD_CMD = "DRIVE_BACKWARD";
 String STOP_CMD = "STOP_DRIVING";
@@ -22,12 +28,24 @@ String TILT_DOWN_CMD = "TILT_DOWN";
 String TILT_LEFT_CMD = "TILT_LEFT";
 String TILT_RIGHT_CMD = "TILT_RIGHT";
 String STOP_TILTING = "STOP_TILTING";
-
-int ROTATION_SPEED = 5;
-int xPos = 0;
-int yPos = 0;
+String RESET_TILT = "RESET_TILT";
 
 String currentCmd = "";
+
+// Servo
+int TILTING_INTERVAL = 20;
+int TILTING_ANGLE_FACTOR = 1;
+int NONE = 0;
+int TILT_UP = 1;
+int TILT_DOWN = 2;
+int TILT_RIGHT = 1;
+int TILT_LEFT = 2;
+
+int xPos;
+int yPos;
+long lastTiltingTime;
+int xTiltDirection;
+int yTiltDirection;
 
 void setup() {
   Serial.begin(9600);           // set up Serial library at 9600 bps
@@ -38,31 +56,22 @@ void setup() {
   leftMotor.setSpeed(255);
   leftMotor.run(RELEASE);
 
-  cameraX.attach(10);
-  cameraY.attach(9);
+  cameraY.attach(10);
+  cameraX.attach(9);
   
-  cameraX.write(96);
-  cameraY.write(90);
-
-  pinMode(US_TRIG_PIN, OUTPUT);
-  pinMode(US_ECHO_PIN, INPUT);
+  xTiltDirection = NONE;
+  yTiltDirection = NONE;
+  xPos = 90;
+  yPos = 90;
+  lastTiltingTime = 0;
+//  
+//  pinMode(US_TRIG_PIN, OUTPUT);
+//  pinMode(US_ECHO_PIN, INPUT);
   lastMeasureTime = 0;
 }
 
 void loop() {
   int distanceMeasurement = 0;
-  
-//  cameraY.write(80);
-//  Serial.write((int)cameraY.read());
-//  delay(500);
-//  cameraY.write(90);
-//  Serial.write((int)cameraY.read());
-//  delay(1000);
-
-//  cameraY.write(85);
-//  delay(500);
-//  cameraY.write(90);
-//  delay(1000);
   
   currentCmd = nextCommand();
  
@@ -84,26 +93,27 @@ void loop() {
   } 
 
   if (currentCmd.equals(TILT_UP_CMD)) {
-    cameraY.write(90 - ROTATION_SPEED);
+    yTiltDirection = TILT_UP;
   } else if (currentCmd.equals(TILT_DOWN_CMD)) {
-    cameraY.write(90 + ROTATION_SPEED);
+    yTiltDirection = TILT_DOWN;
   } else if (currentCmd.equals(TILT_RIGHT_CMD)) {
-//    cameraX.write(96 - ROTATION_SPEED);
+    xTiltDirection = TILT_RIGHT;
   } else if (currentCmd.equals(TILT_LEFT_CMD)) {
-//    cameraX.write(96 + ROTATION_SPEED);
+    xTiltDirection = TILT_LEFT;
   } else if (currentCmd.equals(STOP_TILTING)) {
-    cameraX.write(96);
-    cameraY.write(90);
+    xTiltDirection = NONE;
+    yTiltDirection = NONE;
   }
-
-  if (millis() - lastMeasureTime > MEASURE_DELAY) {
-    lastMeasureTime = millis();
-    distanceMeasurement = measureDistanceCm();
-    String measurements = "{ distance: ";
-    measurements += distanceMeasurement;
-    measurements += " }";
-    Serial.print(measurements);
-  }
+  makeServosMovment();
+//
+//  if (millis() - lastMeasureTime > MEASURE_DELAY) {
+//    lastMeasureTime = millis();
+//    distanceMeasurement = measureDistanceCm();
+//    String measurements = "{ distance: ";
+//    measurements += distanceMeasurement;
+//    measurements += " }";
+//    Serial.print(measurements);
+//  }
 }
 
 String nextCommand() {
@@ -114,6 +124,29 @@ String nextCommand() {
   }
 
   return cmd;
+}
+
+void makeServosMovment() {
+  if (lastTiltingTime + TILTING_INTERVAL > millis()) 
+    return;
+
+  lastTiltingTime = millis();
+  
+  if (yTiltDirection == TILT_UP) {
+    yPos -= TILTING_ANGLE_FACTOR;
+    cameraY.write(yPos);
+  } else if (yTiltDirection == TILT_DOWN) {
+    yPos += TILTING_ANGLE_FACTOR;
+    cameraY.write(yPos);
+  }
+
+  if (xTiltDirection == TILT_RIGHT) {
+    xPos -= TILTING_ANGLE_FACTOR;
+    cameraX.write(xPos);
+  } else if (xTiltDirection == TILT_LEFT) {
+    xPos += TILTING_ANGLE_FACTOR;
+    cameraX.write(xPos);
+  }
 }
 
 int measureDistanceCm() {
