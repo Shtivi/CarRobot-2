@@ -5,6 +5,7 @@
         <navigation-control side='left' v-bind:commandsDispatcher="commandsDispatcher" v-bind:controlOptions="controls.driving"></navigation-control>
         <navigation-control side='right' v-bind:commandsDispatcher="commandsDispatcher" v-bind:controlOptions="controls.cameraTilt"></navigation-control>
         <video-controls></video-controls>
+        <captures-gallery></captures-gallery>
     </div>
 </template>
 
@@ -17,11 +18,12 @@ import { ControlViewOption } from '@/models/ControlViewOption';
 import { ControlOptions } from '@/models/ControlOptions';
 import { CommandsDispatcherApi } from '@/services/CommandsDispatcherApi';
 import VideoControls from './VideoControls.vue';
+import CapturesGallery from './CapturesGallery.vue';
 import config, { IConfig } from '@/config/Config';
 import { State, Action, Getter, Mutation } from 'vuex-class';
 
 @Component({
-    components: {NavigationControl, LiveStreamPlayer, VideoControls, SideBox}
+    components: {NavigationControl, LiveStreamPlayer, VideoControls, SideBox, CapturesGallery}
 })
 export default class DriverCabin extends Vue {
     @Action('connectNotificationsService')

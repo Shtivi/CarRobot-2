@@ -3,27 +3,30 @@ export interface IConfig {
         host: string,
         url: string,
         routes: {
-            sendCommand: string
+            sendCommand: string,
+            getLatestCaptures: string
         }
     }
 }
 
 class Config implements IConfig {
-    private serverUrl: string = "http://192.168.1.41:3000";
+    private hostname: string = "192.168.1.41";
+    private serverUrl: string = `http://${this.hostname}:3000`;
 
     public api = {
         host: this.serverUrl,
         url: this.serverUrl + "/api",
         routes: {
-            sendCommand: "commands"
+            sendCommand: "commands",
+            getLatestCaptures: "captures/latest"
         },
         notificationsService: {
-            url: "ws://192.168.1.41:3000/api/notifications"
+            url: `ws://${this.hostname}:3000/api/notifications`
         }
     }
 
     public liveStream = {
-        streamerUrl: 'ws://192.168.1.41:3000/api/streaming'
+        streamerUrl: `ws://${this.hostname}:3000/api/streaming`
     }
 }
 

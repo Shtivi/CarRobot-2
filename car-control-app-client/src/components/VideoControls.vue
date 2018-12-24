@@ -41,9 +41,8 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
 import { State, Action, Getter, Mutation } from 'vuex-class';
-import Component from 'vue-class-component';
+import {Component, Prop, Vue} from 'vue-property-decorator';
 import { ILiveStreamingState } from '@/store/modules/liveStreaming/ILiveStreamingState';
 import { IStartLiveStreamingPayload } from '@/store/modules/liveStreaming/IStartLiveStreamingPayload';
 import { StreamingStatus } from '@/models/StreamingStatus';

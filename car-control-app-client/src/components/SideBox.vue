@@ -14,7 +14,7 @@
         </ul>
         <ul class="actions">
             <li>
-                <md-button class="md-icon-button">
+                <md-button class="md-icon-button" v-on:click="openGallery()">
                     <md-icon>photo_library</md-icon>
                 </md-button>
             </li>
@@ -23,14 +23,17 @@
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import { Getter } from 'vuex-class';
+import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Getter, Mutation, Action } from 'vuex-class';
 import { IMeasurementsCollection } from '@/models/IMeasurementsCollection';
 
 @Component
 export default class SideBox extends Vue {
     @Getter('getMeasurements')
     private measurements!: IMeasurementsCollection;
+
+    @Action('openGallery')
+    private openGallery!: () => void;
 }
 </script>
 
@@ -49,14 +52,14 @@ export default class SideBox extends Vue {
 
         li {
             .md-icon {
-                color: white!important;
+                // color: white!important;
             }
 
             padding: 0;
             margin-bottom: 10px;
 
             .warning {
-                color: #F44336;
+                color: #F44336!important;
             }
         }
     }

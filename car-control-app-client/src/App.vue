@@ -13,7 +13,13 @@ import DriverCabin from './components/DriverCabin.vue';
     DriverCabin,
   },
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+    // mounted() {
+    //     if (screen.availHeight > screen.availWidth) {
+
+    //     }
+    // }
+}
 </script>
 
 <style lang="scss">
