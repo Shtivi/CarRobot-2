@@ -8,7 +8,7 @@ export class WifiMeter implements IMeasurementSupplier<number> {
 
     public measure(): Promise<number> {
         return new Promise((resolve, reject) => {
-            Process.exec('iwconfig wlan0 | grep Link | sed -n "s/^.*level=-\s*\(\S*\) dBm/\1/p"', (err: Process.ExecException, output: string, stderr: string) => {
+            Process.exec('iwconfig wlan0 | grep Link | sed -n "s/^.*level=-\\s*\\(\\S*\\) dBm/\\1/p"', (err: Process.ExecException, output: string, stderr: string) => {
                 if (err) {
                     reject(err);
                 } else if (stderr) {

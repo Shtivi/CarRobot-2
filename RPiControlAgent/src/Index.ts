@@ -44,20 +44,30 @@ const measurementsMgr: MeasurementsManager = new MeasurementsManager(config.robo
 client.connect().then(() => {
     console.log('connected to remote server');
     
+    console.log('starting measurements');
     measurementsMgr
         .with(new WifiMeter())
-        .onData(data => console.log(data))
-        .onError(err => console.error(err))
+        .onData(data => client.send('measurements', data))
+        .onError(err => {
+            console.error('failure in measurements', err);
+            client.send('error', err);
+        })
         .start();
 
     client.on('data', (data: string) => {
         if (data == 'CAPTURE') {
             cameraController.capture().then((data: string) => {
                 client.send('capture', data).then(() => console.log("captured and sent")).catch(err => console.error("captured but failed sending", err));
-            }).catch(err => client.send('error', err))
+            }).catch(err => {
+                console.error('failed to capture', err);
+                client.send('error', err);
+            })
         } else if (robotCommunicator.getConnectionStatus() == RobotConnectionStatus.CONNECTED) {
             console.log(`Received command: ${data}. Sendind to robot...`);  
-            robotCommunicator.sendCommand(RobotCommand.of(data)).then(() => console.log(`command ${data} sent.`)).catch(console.error);
+            robotCommunicator.sendCommand(RobotCommand.of(data)).then(() => console.log(`command ${data} sent.`)).catch(err => {
+                console.error('error sending command to robot', err);
+                client.send('error', err);
+            });
         }
     });
 
