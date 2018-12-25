@@ -1,7 +1,10 @@
 export class Config {
     public robot: {
         availableCommands: string[],
-        serialPortName: string
+        serialPortName: string,
+        measurements: {
+            interval: number
+        }
     }
 
     public api: {

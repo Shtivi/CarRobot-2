@@ -16,6 +16,8 @@ import { SerialProxyCommunicator } from './robotControl/SerialProxyCommunicator'
 import * as Log4js from 'log4js';
 import { ICameraControl } from './camera/ICameraControl';
 import { PythonScriptCameraControl } from './camera/PythonScriptCameraControl';
+import { MeasurementsManager } from './measurements/MeasurementsManager';
+import { WifiMeter } from './measurements/suppliers/WifiMeter';
 
 console.log("starting initialization");
 const environment: string = (process.env.NODE_ENV ? process.env.NODE_ENV.trim().toUpperCase() : 'DEV');
@@ -37,8 +39,17 @@ let client: IMasterClient = new MasterClient({
     maxConnectionAttemps: config.api.retryPolicy.maxConnectionAttempts
 });
 
+const measurementsMgr: MeasurementsManager = new MeasurementsManager(config.robot.measurements.interval);
+
 client.connect().then(() => {
-    console.log('connected');
+    console.log('connected to remote server');
+    
+    measurementsMgr
+        .with(new WifiMeter())
+        .onData(data => console.log(data))
+        .onError(err => console.error(err))
+        .start();
+
     client.on('data', (data: string) => {
         if (data == 'CAPTURE') {
             cameraController.capture().then((data: string) => {
