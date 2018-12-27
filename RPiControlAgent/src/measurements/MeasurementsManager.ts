@@ -1,10 +1,10 @@
-import { IMeasurementSupplier } from "./IMeasurementSupplier";
+import { IMeasurementIndicator } from "./IMeasurementIndicator";
 import * as events from 'events';
 import { IMeasurementData } from "./IMeasurementData";
 import { Optional } from "../utils/Optional";
 
 export class MeasurementsManager extends events.EventEmitter {
-    private measurementSuppliers: Array<IMeasurementSupplier<any>>;
+    private measurementSuppliers: Array<IMeasurementIndicator<any>>;
     private intervalObj: Optional<NodeJS.Timeout>;
     
     public constructor(private interval: number) {
@@ -28,7 +28,7 @@ export class MeasurementsManager extends events.EventEmitter {
         return this;
     }
 
-    public with(supplier: IMeasurementSupplier<any>): MeasurementsManager {
+    public withIndicator(supplier: IMeasurementIndicator<any>): MeasurementsManager {
         if (!supplier) {
             throw new Error('got an invalid supplier');
         }
@@ -51,12 +51,12 @@ export class MeasurementsManager extends events.EventEmitter {
 
     private makeMeasurements(): void {
         const measurementPromises: Promise<any[]> = 
-            Promise.all(this.measurementSuppliers.map((supplier: IMeasurementSupplier<any>) => supplier.measure()));
+            Promise.all(this.measurementSuppliers.map((supplier: IMeasurementIndicator<any>) => supplier.measure()));
 
         measurementPromises.then((measurementsData: any[]) => {
             if (measurementsData.length == 0)
                 return;
-                
+
             const measurements: IMeasurementData[] = measurementsData.map((measurementValue: any, index: number) => {
                 return {
                     measurementType: this.measurementSuppliers[index].type(),

@@ -22,6 +22,10 @@ import { DBConnection } from './dal/mongoose/DBConnection';
 import { CapturesDao } from './dal/mongoose/CapturesDao';
 import { IUserNotificationsService } from './api/userNotificationsService/IUserNotificationsService';
 import { UserNotificationsService } from './api/userNotificationsService/UserNotificationsService';
+import { IMeasurementData } from './models/IMeasurementData';
+import { IMeasurementsStateManager } from './measurements/IMeasurementsStateManager';
+import { MeasurementsStateManager } from './measurements/MeasurementsStateManager';
+import { MeasurementsAPI } from './api/MeasurementsAPI';
 
 let config: Config;
 let dbConfig: IDatabaseConfig;
@@ -48,6 +52,7 @@ function main() {
     // BL
     const capturesManager: ICapturesManager = 
         new CapturesManager(path.join(__dirname, "../", config.captures.dirName), new CapturesDao());
+    const measurementsManager: IMeasurementsStateManager = new MeasurementsStateManager();
 
     console.log("booting up user notifications service");
     userNotificationsService = new UserNotificationsService(config.notificationsService.path, httpServer);
@@ -56,7 +61,8 @@ function main() {
     robotWsServer = new RobotWebsocketServer(config.robotWsServer.path, httpServer)
         .on('connection', () => robotConnectionChangedHook(true))
         .on('disconnection', () => robotConnectionChangedHook(false))
-        .on('capture', (data: string) => capturedHook(data, capturesManager));
+        .on('capture', (data: string) => capturedHook(data, capturesManager))
+        .on('measurements', (data: IMeasurementData[]) => measurementsHook(data, userNotificationsService, measurementsManager));
     
     console.log("booting up http server");
     const generalRouter: IRouter = Router().use((req, res, next) => {
@@ -66,7 +72,8 @@ function main() {
             next();
         })
         .use('/commands', new CommandsAPI(robotWsServer).router())
-        .use('/captures', new CapturesAPI(capturesManager).router());
+        .use('/captures', new CapturesAPI(capturesManager).router())
+        .use('/measurements', new MeasurementsAPI(measurementsManager).router());
     app.use('/api', generalRouter);
     httpServer.listen(config.httpServer.port, () => {
         console.log(`http server listenning at: http://localhost:${config.httpServer.port}`);
@@ -103,6 +110,11 @@ function capturedHook(base64Data: string, capturesManager: ICapturesManager): vo
         console.error('failed saving capture', err)
         userNotificationsService.sendNotification("error", new Error(`An error occured while capturing: "${err}"`));
     });
+}
+
+function measurementsHook(measurements: IMeasurementData[], notificationsService: IUserNotificationsService, measurementsStateManager: IMeasurementsStateManager): void {
+    measurements.forEach(measurementsStateManager.updateMeasurement.bind(measurementsStateManager));
+    notificationsService.sendNotification('measurements', measurements);
 }
 
 function connectDatabase(dbconfig: IDatabaseConfig) {

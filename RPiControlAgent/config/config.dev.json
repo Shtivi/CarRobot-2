@@ -9,7 +9,7 @@
         ],
         "serialPortName": "X",
         "measurements": {
-            "interval": "1000"
+            "interval": "3000"
         }
     }, 
     "api": {

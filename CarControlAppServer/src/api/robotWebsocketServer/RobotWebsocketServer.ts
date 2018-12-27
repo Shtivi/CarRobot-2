@@ -48,6 +48,9 @@ export class RobotWebsocketServer extends events.EventEmitter implements IRobotW
             case 'capture':
                 this.emit('capture', parsedData.data); 
                 break;
+            case 'measurements': 
+                this.emit('measurements', parsedData.data);
+                break;
         }
     }
 }

@@ -46,7 +46,7 @@ client.connect().then(() => {
     
     console.log('starting measurements');
     measurementsMgr
-        .with(new WifiMeter())
+        .withIndicator(new WifiMeter())
         .onData(data => client.send('measurements', data))
         .onError(err => {
             console.error('failure in measurements', err);
