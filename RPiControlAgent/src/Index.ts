@@ -17,7 +17,7 @@ import * as Log4js from 'log4js';
 import { ICameraControl } from './camera/ICameraControl';
 import { PythonScriptCameraControl } from './camera/PythonScriptCameraControl';
 import { MeasurementsManager } from './measurements/MeasurementsManager';
-import { WifiMeter } from './measurements/suppliers/WifiMeter';
+import { WifiMeter } from './measurements/indicators/WifiMeter';
 
 console.log("starting initialization");
 const environment: string = (process.env.NODE_ENV ? process.env.NODE_ENV.trim().toUpperCase() : 'DEV');
