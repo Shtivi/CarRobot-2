@@ -13,7 +13,7 @@
         }
     }, 
     "api": {
-        "url": "ws://localhost:3000/api/robot",
+        "url": "ws://192.168.1.41:3000/api/robot",
         "retryPolicy": {
             "maxConnectionAttempts": "10"
         }
@@ -22,7 +22,7 @@
         "width": 800,
         "height": 600,
         "fps": 25,
-        "serverHost": "192.168.1.44",
+        "serverHost": "192.168.1.41",
         "serverPort": 3003
     }
 }
