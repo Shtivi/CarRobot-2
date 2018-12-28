@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { BaseApiRouter } from "./BaseApiRouter";
 import { RouteAction, HttpMethod } from "./RouteAction";
 import { ICapturesManager } from "../captures/ICapturesManager";
+import { ICapture } from "../models/captures/ICapture";
 
 export class CapturesAPI extends BaseApiRouter {
     public constructor(private capturesManager: ICapturesManager) {
@@ -23,7 +24,16 @@ export class CapturesAPI extends BaseApiRouter {
     }
 
     private getCaptureById(req: Request, res: Response): void {
+        const captureId: number = Number(req.params.id);
 
+        if (isNaN(captureId)) {
+            res.status(500).send("Invalid picture id - not an number");
+            return;
+        }
+
+        this.capturesManager.getCapture(captureId)
+            .then((capture: ICapture) => res.json(capture))
+            .catch(err => res.status(500).send(err));
     }
 
     private searchCaptures(req: Request, res: Response): void {

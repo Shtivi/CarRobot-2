@@ -45,7 +45,16 @@ export class CapturesManager implements ICapturesManager {
     }    
     
     public getCapture(id: number): Promise<ICapture> {
-        throw new Error("Method not implemented.");
+        return new Promise((resolve, reject) => {
+            this.capturesDao.fetchByTimestamp(id).then((captureInfo: ICaptureInfo) => {   
+                this.getPictureFile(this.formatPicturePath(`${id}.jpeg`)).then((base64: string) => {
+                    resolve({
+                        info: captureInfo,
+                        data: base64
+                    });
+                });
+            }).catch(reject);
+        })
     }
 
     searchCaptures(text: string): Promise<ICapture[]> {

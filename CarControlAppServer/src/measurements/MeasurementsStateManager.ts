@@ -3,10 +3,10 @@ import { IMeasurementData } from "../models/IMeasurementData";
 import * as _ from 'underscore';
 
 export class MeasurementsStateManager implements IMeasurementsStateManager {
-    private measurements: _.Dictionary<IMeasurementData[]>;
+    private measurements: _.Dictionary<IMeasurementData>;
 
     public constructor() {
-        this.measurements = {};
+        this.reset();
     }
 
     updateMeasurement(measurement: IMeasurementData): void {
@@ -14,17 +14,14 @@ export class MeasurementsStateManager implements IMeasurementsStateManager {
             throw new Error('measurement has no type');
         }
 
-        if (!this.measurements[measurement.measurementType]) {
-            this.measurements[measurement.measurementType] = [];
-        }
-
-        this.measurements[measurement.measurementType].push(measurement);
+        this.measurements[measurement.measurementType] = measurement;
     }
 
     retrieveMeasurementsList(): IMeasurementData[] {
-        return Object.keys(this.measurements).map((type: string) => {
-            const currentTypeMeasurements: IMeasurementData[] = this.measurements[type];
-            return currentTypeMeasurements[currentTypeMeasurements.length - 1];
-        })
+        return Object.keys(this.measurements).map((type: string) => this.measurements[type]);
+    }
+
+    reset(): void {
+        this.measurements = {};
     }
 }

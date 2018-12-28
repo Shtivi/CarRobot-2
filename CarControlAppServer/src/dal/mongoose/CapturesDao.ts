@@ -15,7 +15,18 @@ export class CapturesDao extends BaseMongooseDao<ICaptureInfoModel> implements I
     // API
 
     public fetchByTimestamp(time: number): Promise<ICaptureInfo> {
-        throw new Error("Method not implemented.");
+        return new Promise((resolve, reject) => {
+            this.model.findOne({ time: time }, (err: any, data: ICaptureInfoModel) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                if (data)
+                    resolve(data.toObject());
+                else 
+                    reject("capture not found");
+            });
+        })
     }
 
     public addNewCapture(info: ICaptureInfo): Promise<void> {

@@ -26,6 +26,7 @@ import { IMeasurementData } from './models/IMeasurementData';
 import { IMeasurementsStateManager } from './measurements/IMeasurementsStateManager';
 import { MeasurementsStateManager } from './measurements/MeasurementsStateManager';
 import { MeasurementsAPI } from './api/MeasurementsAPI';
+import { MonitorAPI } from './api/MonitorAPI';
 
 let config: Config;
 let dbConfig: IDatabaseConfig;
@@ -59,8 +60,8 @@ function main() {
 
     console.log("booting up robot web socket server");    
     robotWsServer = new RobotWebsocketServer(config.robotWsServer.path, httpServer)
-        .on('connection', () => robotConnectionChangedHook(true))
-        .on('disconnection', () => robotConnectionChangedHook(false))
+        .on('connection', () => robotConnectionChangedHook(measurementsManager, true))
+        .on('disconnection', () => robotConnectionChangedHook(measurementsManager, false))
         .on('capture', (data: string) => capturedHook(data, capturesManager))
         .on('measurements', (data: IMeasurementData[]) => measurementsHook(data, userNotificationsService, measurementsManager));
     
@@ -71,6 +72,7 @@ function main() {
             res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
             next();
         })
+        .use('/monitor', new MonitorAPI().router())
         .use('/commands', new CommandsAPI(robotWsServer).router())
         .use('/captures', new CapturesAPI(capturesManager).router())
         .use('/measurements', new MeasurementsAPI(measurementsManager).router());
@@ -95,8 +97,12 @@ function main() {
     liveStreamingServer = new LiveStreamingServer(config.liveStreamingServer.path, httpServer, liveStreamReceiver);
 }
 
-function robotConnectionChangedHook(isConnected: boolean) {
+function robotConnectionChangedHook(measurementsManager: IMeasurementsStateManager, isConnected: boolean) {
     console.log(`robot ${isConnected ? 'connected' : 'disconnected'}`);
+    measurementsManager.updateMeasurement({
+        measurementType: 'robotConnection',
+        value: isConnected
+    })
     userNotificationsService.sendNotification('robotConnectionStateChanged', isConnected);
 }
 
